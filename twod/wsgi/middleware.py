@@ -15,8 +15,20 @@
 #
 ##############################################################################
 """
-Enhanced WSGI support for Django applications.
+WSGI and Django middleware.
 
 """
 
+__all__ = ("RoutingArgsMiddleware", )
+
+
+class RoutingArgsMiddleware(object):
+    """
+    Django middleware which implements the `wsgiorg.routing_args standard
+    <http://wsgi.org/wsgi/Specifications/routing_args>`_.
+    
+    """
+    
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        request.environ['wsgiorg.routing_args'] = (view_args, view_kwargs.copy())
 
