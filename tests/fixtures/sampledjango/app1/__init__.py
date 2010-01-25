@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 # Copyright (c) 2010, 2degrees Limited <gustavonarea@2degreesnetwork.com>.
@@ -14,10 +13,4 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Test suite for :mod:`twod.wsgi`.
-
-"""
-import os
-
-os.environ['DJANGO_SETTINGS_MODULE'] = "tests.fixtures.sampledjango"
+"""Mock App 1"""

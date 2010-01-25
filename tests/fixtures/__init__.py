@@ -15,9 +15,7 @@
 #
 ##############################################################################
 """
-Test suite for :mod:`twod.wsgi`.
+Fixtures for the test suite of :mod:`twod.wsgi`.
 
 """
-import os
 
-os.environ['DJANGO_SETTINGS_MODULE'] = "tests.fixtures.sampledjango"

@@ -15,9 +15,8 @@
 #
 ##############################################################################
 """
-Test suite for :mod:`twod.wsgi`.
+Mock Django application to test the repoze.what Django plugin.
 
 """
-import os
 
-os.environ['DJANGO_SETTINGS_MODULE'] = "tests.fixtures.sampledjango"
+mock_view = lambda request: "Response"

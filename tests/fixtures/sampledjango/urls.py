@@ -14,10 +14,19 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Test suite for :mod:`twod.wsgi`.
 
-"""
-import os
+from django.conf.urls.defaults import *
 
-os.environ['DJANGO_SETTINGS_MODULE'] = "tests.fixtures.sampledjango"
+from tests.fixtures.sampledjango.app1 import urls as app1_urls
+from tests.fixtures.sampledjango.app2 import urls as app2_urls
+from tests.fixtures.sampledjango.unsecured_app import urls as unsecured_urls
+
+# Uncomment the next two lines to enable the admin:
+# from django.contrib import admin
+# admin.autodiscover()
+
+urlpatterns = patterns('',
+    (r'^app1/', include(app1_urls)),
+    (r'^app2/', include(app2_urls)),
+    (r'^unsecured_app/', include(unsecured_urls)),
+)
