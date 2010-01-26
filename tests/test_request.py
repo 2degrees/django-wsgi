@@ -55,7 +55,7 @@ class TestRequest(object):
         assert_not_equal(twod_req.POST, webob_req.POST)
         # Although WebOB POST arguments are still accessible and read, even
         # though Django read them first:
-        eq_(twod_req.unicode_POST, webob_req.POST)
+        eq_(twod_req.uPOST, webob_req.POST)
         
         # WebOb shouldn't have changed the CONTENT_LENGTH, otherwise Django
         # won't read the input:
@@ -64,7 +64,7 @@ class TestRequest(object):
         # Finally, let's make sure Django will read the input even if WebOb read
         # it first:
         (django_req2, webob_req2, twod_req2) = self._make_requests(environ)
-        eq_(twod_req2.unicode_POST, webob_req2.POST)
+        eq_(twod_req2.uPOST, webob_req2.POST)
         eq_(twod_req2.POST, django_req2.POST)
     
     def test_get(self):
@@ -82,12 +82,12 @@ class TestRequest(object):
         assert_not_equal(twod_req.GET, webob_req.GET)
         # Although WebOB GET arguments are still accessible and read, even
         # though Django read them first:
-        eq_(twod_req.unicode_GET, webob_req.GET)
+        eq_(twod_req.uGET, webob_req.GET)
         
         # Finally, let's make sure Django will read the QS even if WebOb read
         # it first:
         (django_req2, webob_req2, twod_req2) = self._make_requests(environ)
-        eq_(twod_req2.unicode_GET, webob_req2.GET)
+        eq_(twod_req2.uGET, webob_req2.GET)
         eq_(twod_req2.GET, django_req2.GET)
     
     def test_content_length_in_post(self):
@@ -112,7 +112,7 @@ class TestRequest(object):
         ok_("CONTENT_LENGTH" not in twod_request.environ)
         
         # But it should have been set when read with WebOb:
-        twod_request.unicode_POST
+        twod_request.uPOST
         ok_("CONTENT_LENGTH" in twod_request.environ)
     
     def _make_requests(self, environ):

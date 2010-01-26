@@ -31,8 +31,8 @@ class TwodWSGIRequest(WSGIRequest, Request):
     uses :attr:`django.core.handlers.wsgi.WSGIRequest.GET` instead of
     :attr:`webob.Request.GET`.
     
-    To access WebOb's GET and POST dictionaries, you have to use ``.unicode_GET``
-    and ``.unicode_POST`` respectively.
+    To access WebOb's GET and POST dictionaries, you have to use ``.uGET``
+    and ``.uPOST`` respectively.
     
     """
     
@@ -50,8 +50,8 @@ class TwodWSGIRequest(WSGIRequest, Request):
     
     #{ Handing arguments
     
-    unicode_POST = Request.POST
-    unicode_GET = Request.GET
+    uPOST = Request.POST
+    uGET = Request.GET
     
     # webob.Request
     @property
