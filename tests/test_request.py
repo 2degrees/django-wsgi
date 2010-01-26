@@ -90,6 +90,31 @@ class TestRequest(object):
         eq_(twod_req2.unicode_GET, webob_req2.GET)
         eq_(twod_req2.GET, django_req2.GET)
     
+    def test_content_length_in_post(self):
+        """
+        The content length should be set if it wasn't set originally in a
+        POST request.
+        
+        """
+        environ = {
+            'REQUEST_METHOD': "POST",
+            'CONTENT_TYPE': "application/x-www-form-urlencoded",
+            'wsgi.input': StringIO(urlencode({'foo': "bar", 'bar': "foo"})),
+            }
+        twod_request = TwodWSGIRequest(environ)
+        
+        ok_("CONTENT_LENGTH" not in twod_request.environ,
+            "The Content-Length was set in the constructor")
+        
+        # The CONTENT_LENGTH shouldn't have been set after reading the POST
+        # arguments with Django:
+        twod_request.POST
+        ok_("CONTENT_LENGTH" not in twod_request.environ)
+        
+        # But it should have been set when read with WebOb:
+        twod_request.unicode_POST
+        ok_("CONTENT_LENGTH" in twod_request.environ)
+    
     def _make_requests(self, environ):
         
         base_environ = {

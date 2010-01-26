@@ -60,16 +60,15 @@ class TwodWSGIRequest(WSGIRequest, Request):
         Return the POST arguments by using WebOb.
         
         """
-        # "Resetting" the input so Django will read it:
-        self._seek_input()
-        
         # Before returning the POST arguments, we have to restore the content
         # length, which is reset by WebOb:
-        original_content_length = self.environ.get("CONTENT_LENGTH", "-1")
+        original_content_length = self.environ.get("CONTENT_LENGTH")
         try:
             return super(TwodWSGIRequest, self).str_POST
         finally:
             self.environ['CONTENT_LENGTH'] = original_content_length
+            # "Resetting" the input so Django will read it:
+            self._seek_input()
     
     # django.core.handlers.wsgi.WSGIRequest
     def _load_post_and_files(self):
@@ -77,9 +76,11 @@ class TwodWSGIRequest(WSGIRequest, Request):
         Parse the POST arguments and uploaded files by using Django.
         
         """
-        # "Resetting" the input so WebOb will read it:
-        self._seek_input()
-        return super(TwodWSGIRequest, self)._load_post_and_files()
+        try:
+            return super(TwodWSGIRequest, self)._load_post_and_files()
+        finally:
+            # "Resetting" the input so WebOb will read it:
+            self._seek_input()
     
     def _seek_input(self):
         if "wsgi.input" in self.environ:
