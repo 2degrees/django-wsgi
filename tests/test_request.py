@@ -165,3 +165,42 @@ class TestRequest(object):
     
     #}
 
+
+class TestWSGIHandler(object):
+    """Tests for :class:`TwodWSGIHandler`."""
+    
+    def setup(self):
+        self.handler = TelltaleHandler()
+    
+    def test_right_request_class(self):
+        """The WSGI handler must use Twod's request class."""
+        environ = {'REQUEST_METHOD': "GET"}
+        def start_response(status, response_headers): pass
+        
+        # We're going to get an exception because not all the environment keys
+        # are defined, but that doesn't matter because by that time we should
+        # already have the request object and that's all we need:
+        try:
+            self.handler(environ, start_response)
+        except KeyError:
+            pass
+        
+        ok_(isinstance(self.handler.request, TwodWSGIRequest))
+
+
+#{ Test utilities
+
+
+class TelltaleHandler(TwodWSGIHandler):
+    """
+    Mock WSGI handler based on Twod's, which is going to be called once and it's
+    going to store the request object it got.
+    
+    """
+    
+    def get_response(self, request):
+        self.request = request
+        return super(TelltaleHandler, self).get_response(request)
+
+
+#}
