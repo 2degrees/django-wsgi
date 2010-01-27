@@ -58,7 +58,6 @@ setup(name="twod.wsgi",
       include_package_data=True,
       zip_safe=False,
       tests_require = [
-        "nose",
         "coverage",
         ],
       install_requires=[
@@ -66,10 +65,14 @@ setup(name="twod.wsgi",
         "WebOb >= 0.9.7",
         "PasteDeploy >= 1.3.3",
         "setuptools",
+        "nose >= 0.11.1",
         ],
       test_suite="nose.collector",
       entry_points = """\
         [paste.app_factory]
         main = twod.wsgi.appsetup:wsgify_django
+        
+        [nose.plugins.0.10]
+        django-wsgified = twod.wsgi.nose_plugin:DjangoNosePlugin
       """
       )
