@@ -43,6 +43,7 @@ class TestDjangoWsgifytor(BaseDjangoTestCase):
             {},
             django_settings_module="tests.fixtures.sampledjango.settings",
             FOO=10,
+            debug="yes",
             )
         ok_(isinstance(app, WSGIHandler))
         from django.conf import settings
@@ -62,7 +63,7 @@ class TestDjangoLoader(BaseDjangoTestCase):
         eq_(settings.BAR, "20")
         ok_("DJANGO_SETTINGS_MODULE" in os.environ)
         eq_(os.environ['DJANGO_SETTINGS_MODULE'],
-            "tests.fixtures.sampledjango.settings")
+            "tests.fixtures.sampledjango.settings2")
 
 
 class TestSettingUpSettings(BaseDjangoTestCase):
@@ -76,6 +77,7 @@ class TestSettingUpSettings(BaseDjangoTestCase):
         
         """
         additional_settings = {
+            'debug': "yes",
             'setting1': object(),
             'setting2': object(),
             'django_settings_module': "tests.fixtures.empty_module",
@@ -95,7 +97,10 @@ class TestSettingUpSettings(BaseDjangoTestCase):
         settings.
         
         """
-        settings = {'django_settings_module': "tests.fixtures.empty_module2"}
+        settings = {
+            'debug': "yes",
+            'django_settings_module': "tests.fixtures.empty_module2",
+            }
         _set_up_settings(settings)
         from tests.fixtures import empty_module2
         
@@ -111,6 +116,7 @@ class TestSettingUpSettings(BaseDjangoTestCase):
         
         """
         additional_settings = {
+            'debug': "yes",
             'MEMBER': "FOO",
             'django_settings_module': "tests.fixtures.one_member_module",
             }
@@ -130,6 +136,7 @@ class TestSettingUpSettings(BaseDjangoTestCase):
         
         """
         additional_settings = {
+            'debug': "yes",
             'DA_LIST': (8, 9),
             'django_settings_module': "tests.fixtures.list_module",
             }
@@ -147,12 +154,23 @@ class TestSettingUpSettings(BaseDjangoTestCase):
         additional_settings = {}
         assert_raises(ValueError, _set_up_settings, additional_settings)
     
+    def test_DEBUG_in_python_configuration(self):
+        """DEBUG must not be set in the Django settings module."""
+        settings = {
+            'django_settings_module':
+                "tests.fixtures.sampledjango.debug_settings",
+            }
+        assert_raises(ValueError, _set_up_settings, settings)
+    
     def test_non_existing_module(self):
         """
         ImportError must be propagated if the settings module doesn't exist.
         
         """
-        additional_settings = {'django_settings_module': "non_existing_module"}
+        additional_settings = {
+            'django_settings_module': "non_existing_module",
+            'debug': "yes",
+            }
         assert_raises(ImportError, _set_up_settings, additional_settings)
 
 
@@ -161,8 +179,12 @@ class TestSettingsConvertion(object):
     
     def test_official_booleans(self):
         """Django's boolean settings must be converted."""
-        for setting_name in _DJANGO_BOOLEANS:
-            settings = {setting_name: "True"}
+        # We must exclude "DEBUG" because it's not supposed to be set in the
+        # initial settings:
+        booleans = _DJANGO_BOOLEANS - frozenset(["DEBUG"])
+        
+        for setting_name in booleans:
+            settings = {'debug': "yes", setting_name: "True"}
             _convert_settings(settings)
             eq_(settings[setting_name],
                 True,
@@ -173,6 +195,7 @@ class TestSettingsConvertion(object):
     def test_custom_boolean(self):
         """Custom booleans should be converted."""
         settings = {
+            'debug': "yes",
             'twod.booleans': ("mybool", ),
             'mybool': "no",
             }
@@ -182,7 +205,7 @@ class TestSettingsConvertion(object):
     def test_official_integers(self):
         """Django's integer settings must be converted."""
         for setting_name in _DJANGO_INTEGERS:
-            settings = {setting_name: 2}
+            settings = {'debug': "yes", setting_name: 2}
             _convert_settings(settings)
             eq_(settings[setting_name],
                 2,
@@ -193,6 +216,7 @@ class TestSettingsConvertion(object):
     def test_custom_integer(self):
         """Custom integers should be converted."""
         settings = {
+            'debug': "yes",
             'twod.integers': ("myint", ),
             'myint': "3",
             }
@@ -203,7 +227,10 @@ class TestSettingsConvertion(object):
         """Django's tuple settings must be converted."""
         items = ("foo", "bar", "baz")
         for setting_name in _DJANGO_TUPLES:
-            settings = {setting_name: "\n    ".join(items)}
+            settings = {
+                'debug': "yes",
+                setting_name: "\n    ".join(items),
+                }
             _convert_settings(settings)
             eq_(settings[setting_name], items,
                 "%s must be a tuple, but it is %r" % (setting_name,
@@ -214,6 +241,7 @@ class TestSettingsConvertion(object):
         """Custom tuples should be converted."""
         items = ("foo", "bar", "baz")
         settings = {
+            'debug': "yes",
             'twod.tuples': ("mytuple", ),
             'mytuple': "\n    ".join(items),
             }
@@ -225,7 +253,7 @@ class TestSettingsConvertion(object):
         items = ("foo;the bar;  baz", "bar ;foo", "baz")
         nested_items = (("foo", "the bar", "baz"), ("bar", "foo"), ("baz",))
         for setting_name in _DJANGO_NESTED_TUPLES:
-            settings = {setting_name: "\n    ".join(items)}
+            settings = {'debug': "yes", setting_name: "\n    ".join(items)}
             _convert_settings(settings)
             eq_(settings[setting_name], nested_items)
     
@@ -234,6 +262,7 @@ class TestSettingsConvertion(object):
         items = ("foo;the bar;  baz", "bar ;foo", "baz")
         nested_items = (("foo", "the bar", "baz"), ("bar", "foo"), ("baz",))
         settings = {
+            'debug': "yes",
             'twod.nested_tuples': ("my_nested_tuple", ),
             'my_nested_tuple': "\n    ".join(items),
             }
@@ -246,19 +275,37 @@ class TestSettingsConvertion(object):
         is.
         
         """
-        settings = {'parameter': "value"}
+        settings = {'debug': "yes", 'parameter': "value"}
         _convert_settings(settings)
         eq_(settings['parameter'], "value")
     
     def test_unsupported_settings(self):
         """Unsupported settings are definitely not supported."""
         for setting_name in _DJANGO_UNSUPPORTED_SETTINGS:
-            assert_raises(ValueError, _convert_settings, {setting_name: "foo"})
+            settings = {'debug': "yes", setting_name: "foo"}
+            assert_raises(ValueError, _convert_settings, settings)
     
-    def test__file__is_igored(self):
+    def test__file__is_ignored(self):
         """The __file__ argument must be renamed to paste_configuration_file."""
-        settings = {'__file__': "somewhere"}
+        settings = {'debug': "yes", '__file__': "somewhere"}
         _convert_settings(settings)
         ok_("__file__" not in settings)
         ok_("paste_configuration_file" in settings)
         eq_(settings['paste_configuration_file'], "somewhere")
+    
+    def test_DEBUG_in_ini_config(self):
+        """DEBUG must not be set in the .ini configuration file."""
+        settings = {'DEBUG': "True"}
+        assert_raises(ValueError, _convert_settings, settings)
+    
+    def test_pastes_debug(self):
+        """Django's "DEBUG" must be set to Paster's "debug"."""
+        settings = {'debug': "true"}
+        _convert_settings(settings)
+        ok_("DEBUG" in settings)
+        eq_(settings['DEBUG'], True)
+    
+    def test_no_paste_debug(self):
+        """Ensure the "debug" directive for Paste is set."""
+        settings = {}
+        assert_raises(ValueError, _convert_settings, settings)

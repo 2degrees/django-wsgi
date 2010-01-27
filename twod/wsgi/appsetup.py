@@ -39,6 +39,8 @@ def wsgify_django(global_config, **local_conf):
     :raises ValueError: If ``local_conf`` contains a Django setting which is
         not supported.
     :raises ValueError: If the ``django_settings_module`` directive is not set.
+    :raises ValueError: If Django's ``DEBUG`` is set instead of Paste's
+        ``debug``.
     :return: The Django application as a WSGI application.
     :rtype: :class:`~twod.wsgi.request.TwodWSGIHandler`
     
@@ -55,6 +57,8 @@ def load_django(config_uri):
     :raises ValueError: If ``local_conf`` contains a Django setting which is
         not supported.
     :raises ValueError: If the ``django_settings_module`` directive is not set.
+    :raises ValueError: If Django's ``DEBUG`` is set instead of Paste's
+        ``debug``.
     
     """
     additional_settings = appconfig(config_uri)
@@ -74,8 +78,6 @@ def _set_up_settings(additional_settings):
     
     os.environ['DJANGO_SETTINGS_MODULE'] = django_settings_module
     
-    _convert_settings(additional_settings)
-    
     # Attaching the variables to the settings module, at least those which had
     # not been defined.
     # We need the module name for __import__ to work properly:
@@ -83,6 +85,13 @@ def _set_up_settings(additional_settings):
     module = django_settings_module.split(".")[-1]
     settings_module = __import__(django_settings_module, additional_settings,
                                  fromlist=[module])
+    
+    if hasattr(settings_module, "DEBUG"):
+        raise ValueError('Module %s must not define "DEBUG". It must be set '
+                         'in the PasteDesploy configuration file as "debug".' %
+                         django_settings_module)
+    
+    _convert_settings(additional_settings)
     
     for (setting_name, setting_value) in additional_settings.items():
         if not hasattr(settings_module, setting_name):
@@ -174,6 +183,17 @@ def _convert_settings(settings):
     Convert ``settings`` into the right types.
     
     """
+    # First of all, let's make sure Django will use Paste's "debug" value:
+    if "DEBUG" in settings:
+        raise ValueError("Do not set Django's DEBUG in the configuration file; "
+                         "use Paste's 'debug' instead")
+    if "debug" not in settings:
+        raise ValueError("Paste's 'debug' directive must be set in the "
+                         "configuration file")
+    settings['DEBUG'] = settings['debug']
+    
+    # Now it's safe to move on with the type casting:
+    
     custom_booleans = aslist(settings.get("twod.booleans", ""))
     custom_integers = aslist(settings.get("twod.integers", ""))
     custom_tuples = aslist(settings.get("twod.tuples", ""))
