@@ -65,9 +65,12 @@ setup(name="twod.wsgi",
       install_requires=[
         "Django >= 1.1",
         "WebOb >= 0.9.7",
+        "PasteDeploy >= 1.3.3",
         "setuptools",
         ],
       test_suite="nose.collector",
       entry_points = """\
+        [paste.app_factory]
+        main = twod.wsgi.appsetup:wsgify_django
       """
       )

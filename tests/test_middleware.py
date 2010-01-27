@@ -18,9 +18,13 @@
 Tests for the Django middleware.
 
 """
+import os
+
 from nose.tools import eq_, ok_
 
 from twod.wsgi.middleware import RoutingArgsMiddleware
+
+os.environ['DJANGO_SETTINGS_MODULE'] = "tests.fixtures.sampledjango"
 
 
 class TestRoutingArgs(object):

@@ -27,8 +27,10 @@ from django.core.handlers.wsgi import WSGIRequest, WSGIHandler
 
 from twod.wsgi.request import TwodWSGIRequest, TwodWSGIHandler
 
+from tests import BaseDjangoTestCase
 
-class TestRequest(object):
+
+class TestRequest(BaseDjangoTestCase):
     """Tests for the enhanced request objects."""
     
     #{ Testing GET and POST arguments
@@ -166,11 +168,12 @@ class TestRequest(object):
     #}
 
 
-class TestWSGIHandler(object):
+class TestWSGIHandler(BaseDjangoTestCase):
     """Tests for :class:`TwodWSGIHandler`."""
     
     def setup(self):
         self.handler = TelltaleHandler()
+        super(TestWSGIHandler, self).setup()
     
     def test_right_request_class(self):
         """The WSGI handler must use Twod's request class."""
