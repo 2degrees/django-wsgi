@@ -24,7 +24,7 @@ from nose.tools import eq_, ok_, assert_false, assert_not_equal
 from webob import Request
 from django.core.handlers.wsgi import WSGIRequest, WSGIHandler
 
-from twod.wsgi.request import TwodWSGIRequest, TwodWSGIHandler
+from twod.wsgi.handler import TwodWSGIRequest, DjangoApplication
 
 from tests import BaseDjangoTestCase
 
@@ -168,7 +168,7 @@ class TestRequest(BaseDjangoTestCase):
 
 
 class TestWSGIHandler(BaseDjangoTestCase):
-    """Tests for :class:`TwodWSGIHandler`."""
+    """Tests for :class:`DjangoApplication`."""
     
     def setup(self):
         self.handler = TelltaleHandler()
@@ -193,7 +193,7 @@ class TestWSGIHandler(BaseDjangoTestCase):
 #{ Test utilities
 
 
-class TelltaleHandler(TwodWSGIHandler):
+class TelltaleHandler(DjangoApplication):
     """
     Mock WSGI handler based on Twod's, which is going to be called once and it's
     going to store the request object it got.

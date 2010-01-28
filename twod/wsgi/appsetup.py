@@ -23,7 +23,7 @@ from logging import getLogger
 from paste.deploy.loadwsgi import appconfig
 from paste.deploy.converters import asbool, asint, aslist
 
-from twod.wsgi.request import TwodWSGIHandler
+from twod.wsgi.handler import DjangoApplication
 
 
 __all__ = ("wsgify_django", "load_django")
@@ -42,11 +42,11 @@ def wsgify_django(global_config, **local_conf):
     :raises ValueError: If Django's ``DEBUG`` is set instead of Paste's
         ``debug``.
     :return: The Django application as a WSGI application.
-    :rtype: :class:`~twod.wsgi.request.TwodWSGIHandler`
+    :rtype: :class:`~twod.wsgi.request.DjangoApplication`
     
     """
     _set_up_settings(local_conf)
-    return TwodWSGIHandler()
+    return DjangoApplication()
 
 
 def load_django(config_uri):
