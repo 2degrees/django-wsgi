@@ -73,6 +73,6 @@ setup(name="twod.wsgi",
         main = twod.wsgi.appsetup:wsgify_django
         
         [nose.plugins.0.10]
-        django-wsgified = twod.wsgi.nose_plugin:DjangoNosePlugin
+        django-wsgified = django_wsgified:DjangoWsgifiedPlugin
       """
       )
