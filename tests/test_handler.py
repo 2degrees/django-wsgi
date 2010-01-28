@@ -24,7 +24,8 @@ from nose.tools import eq_, ok_, assert_false, assert_not_equal
 from webob import Request
 from django.core.handlers.wsgi import WSGIRequest, WSGIHandler
 
-from twod.wsgi.handler import TwodWSGIRequest, DjangoApplication
+from twod.wsgi import DjangoApplication
+from twod.wsgi.handler import TwodWSGIRequest
 
 from tests import BaseDjangoTestCase
 

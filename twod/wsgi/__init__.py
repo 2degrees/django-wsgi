@@ -18,4 +18,5 @@ Enhanced WSGI support for Django applications.
 
 """
 
-
+# Importing elements that should be available from this namespace:
+from twod.wsgi.handler import DjangoApplication
