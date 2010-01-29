@@ -24,35 +24,8 @@ from nose.tools import eq_, ok_, assert_false, assert_raises
 
 from twod.wsgi import call_wsgi_app, make_wsgi_view
 from twod.wsgi.handler import TwodWSGIRequest
-from twod.wsgi.embedded_wsgi import _ResponseStarter
 
 from tests import BaseDjangoTestCase
-
-
-class TestResponseStarter(BaseDjangoTestCase):
-    """Tests for the internal _ResponseStarter."""
-    
-    def test_constructor(self):
-        """The constructor should set all the attributes correctly."""
-        start_response = _ResponseStarter()
-        eq_(None, start_response.status)
-        eq_([], start_response.response_headers)
-        eq_(None, start_response.exc_info)
-    
-    def test_call(self):
-        start_response = _ResponseStarter()
-        status = "200 Everything's alright"
-        headers = (
-            ("X-FOO", "ABC"),
-            ("X-BAR", "XYZ"),
-            )
-        exc_info = object()
-        # Starting the mock response:
-        start_response(status, headers, exc_info)
-        # Checking whether they were all set correctly:
-        eq_(start_response.status, 200)
-        eq_(start_response.response_headers, headers)
-        eq_(start_response.exc_info, exc_info)
 
 
 class TestCallWSGIApp(BaseDjangoTestCase):

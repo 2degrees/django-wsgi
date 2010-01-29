@@ -19,7 +19,6 @@ Utilities to use WSGI applications within Django.
 """
 
 from Cookie import SimpleCookie
-from itertools import chain
 
 from django.http import HttpResponse
 
@@ -79,14 +78,13 @@ def call_wsgi_app(wsgi_app, request, mount_point=None):
         del new_request.environ['webob.adhoc_attrs']
     
     # Calling the WSGI application and getting its response:
-    response_wrapper = _ResponseStarter()
-    wsgi_response = wsgi_app(new_request.environ, response_wrapper)
-    body = chain(response_wrapper.body, wsgi_response)
+    (status, headers, body) = new_request.call_application(wsgi_app)
+    status = int(status[:3])
     
     # Turning its response into a Django response:
     cookies = SimpleCookie()
-    django_response = HttpResponse(body, status=response_wrapper.status)
-    for (header, value) in response_wrapper.response_headers:
+    django_response = HttpResponse(body, status=status)
+    for (header, value) in headers:
         if header.upper() == "SET-COOKIE":
             if isinstance(value, unicode):
                 # It can't be Unicode:
@@ -122,34 +120,3 @@ def make_wsgi_view(wsgi_app, mount_point=None):
         return call_wsgi_app(wsgi_app, request, mount_point)
     return view
 
-
-#{ Internal WSGI stuff
-
-
-class _ResponseStarter(object):
-    """
-    Callable to be used as ``start_response`` in order to extract the HTTP
-    status code and headers.
-    
-    """
-    
-    def __init__(self):
-        self.status = None
-        self.response_headers = []
-        self.exc_info = None
-        self.body = []
-    
-    def __call__(self, status, response_headers, exc_info=None):
-        self.status = int(status[:3])
-        self.response_headers = response_headers
-        # exc_info is not used at all. It does not seem to be possible to use
-        # it in Django.
-        self.exc_info = exc_info
-        
-        def write(data):
-            self.body.append(data)
-        
-        return write
-
-
-#}
