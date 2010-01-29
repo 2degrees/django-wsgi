@@ -261,6 +261,19 @@ class TestCallWSGIApp(BaseDjangoTestCase):
             "body as iterable"
             )
         eq_(http_response, str(django_response))
+    
+    def test_closure_response(self):
+        """The .close() method in the response (if any) must be kept."""
+        app = MockClosingApp("200 It is OK", [])
+        django_view = make_wsgi_view(app, "/blog")
+        # Running a request:
+        environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
+        request = make_request(**environ)
+        django_response = django_view(request)
+        # Checking the .close() call:
+        assert_false(app.app_iter.closed)
+        django_response.close()
+        ok_(app.app_iter.closed)
 
 
 class TestWSGIView(BaseDjangoTestCase):
@@ -284,7 +297,7 @@ class TestWSGIView(BaseDjangoTestCase):
                         django_response._headers['x-salutation'])
 
 
-#{ Test utilities
+#{ Mock definitions
 
 
 class MockApp(object):
@@ -324,7 +337,7 @@ class MockWriteApp(MockApp):
     Mock WSGI app which uses the write() function.
     
     """
-
+    
     def __call__(self, environ, start_response):
         self.environ = environ
         write = start_response(self.status, self.headers)
@@ -332,6 +345,33 @@ class MockWriteApp(MockApp):
         write(" as")
         write(" iterable")
         return []
+
+
+class MockClosingApp(MockApp):
+    """Mock WSGI app whose response contains a close() method."""
+    
+    def __init__(self, *args, **kwargs):
+        super(MockClosingApp, self).__init__(*args, **kwargs)
+        self.app_iter = ClosingAppIter()
+    
+    def __call__(self, environ, start_response):
+        body = super(MockClosingApp, self).__call__(environ,start_response)
+        self.app_iter.extend(body)
+        return self.app_iter
+
+
+class ClosingAppIter(list):
+    """Mock response iterable with a close() method."""
+    
+    def __init__(self, *args, **kwargs):
+        super(ClosingAppIter, self).__init__(*args, **kwargs)
+        self.closed = False
+    
+    def close(self):
+        self.closed = True
+
+
+#{ Test utilities
 
 
 def make_request(authenticated=False, **environ):
