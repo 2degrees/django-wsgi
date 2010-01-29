@@ -37,17 +37,17 @@ class TwodWSGIRequest(WSGIRequest, Request):
     
     """
     
+    # The following are used as attributes by Django's request class instances.
+    # If we don't set them class-wide, WebOb is going to put them into its
+    # ``webob.adhoc_attrs`` variable. See webob.Request:__setattr__.
+    environ = None
+    path = None
+    method = None
+    META = None
+    
     def __init__(self, environ):
         Request.__init__(self, environ)
         WSGIRequest.__init__(self, environ)
-    
-    #{ Attribute handing
-    
-    __getattr__ = Request.__getattr__
-    __delattr__ = Request.__delattr__
-    
-    def __setattr__(self, attr, value):
-        self.environ.setdefault("webob.adhoc_attrs", {})[attr] = value
     
     #{ Handing arguments
     
