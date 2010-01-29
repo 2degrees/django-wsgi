@@ -77,3 +77,80 @@ class LoggingHandlerFixture(object):
     
     def undo(self):
         self.logger.removeHandler(self.handler)
+
+
+#{ Mock WSGI apps
+
+
+class MockApp(object):
+    """
+    Mock WSGI application.
+    
+    """
+    
+    def __init__(self, status, headers):
+        self.status = status
+        self.headers = headers
+
+    def __call__(self, environ, start_response):
+        self.environ = environ
+        start_response(self.status, self.headers)
+        return ["body"]
+
+
+class MockGeneratorApp(MockApp):
+    """
+    Mock WSGI application that returns an iterator.
+    
+    """
+
+    def __call__(self, environ, start_response):
+        self.environ = environ
+        start_response(self.status, self.headers)
+        def gen():
+            yield "body"
+            yield " as"
+            yield " iterable"
+        return gen()
+
+
+class MockWriteApp(MockApp):
+    """
+    Mock WSGI app which uses the write() function.
+    
+    """
+    
+    def __call__(self, environ, start_response):
+        self.environ = environ
+        write = start_response(self.status, self.headers)
+        write( "body")
+        write(" as")
+        write(" iterable")
+        return []
+
+
+class MockClosingApp(MockApp):
+    """Mock WSGI app whose response contains a close() method."""
+    
+    def __init__(self, *args, **kwargs):
+        super(MockClosingApp, self).__init__(*args, **kwargs)
+        self.app_iter = ClosingAppIter()
+    
+    def __call__(self, environ, start_response):
+        body = super(MockClosingApp, self).__call__(environ,start_response)
+        self.app_iter.extend(body)
+        return self.app_iter
+
+
+class ClosingAppIter(list):
+    """Mock response iterable with a close() method."""
+    
+    def __init__(self, *args, **kwargs):
+        super(ClosingAppIter, self).__init__(*args, **kwargs)
+        self.closed = False
+    
+    def close(self):
+        self.closed = True
+
+
+#}

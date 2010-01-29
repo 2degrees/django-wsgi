@@ -22,11 +22,13 @@ from Cookie import SimpleCookie
 
 from django.http import HttpResponse
 
+from twod.wsgi.exc import ApplicationCallError
+
 
 __all__ = ("call_wsgi_app", "make_wsgi_view")
 
 
-def call_wsgi_app(wsgi_app, request, mount_point=None):
+def call_wsgi_app(wsgi_app, request, mount_point):
     """
     Call the ``wsgi_app`` with ``request`` and return its response.
     
@@ -35,35 +37,21 @@ def call_wsgi_app(wsgi_app, request, mount_point=None):
     :param request: The Django request.
     :type request: :class:`django.http.HttpRequest`
     :param mount_point: The path where the WSGI application should be mounted.
-    :type mount_point: regex pattern or :class:`basestring`
+    :type mount_point: :class:`basestring`
     :return: The response from the WSGI application, turned into a Django
         response.
     :rtype: :class:`django.http.HttpResponse`
-    
-    If ``mount_point`` is not present, the URL matched for the current request
-    in Django will be used -- This is the desired behavior is most situations.
     
     """
     new_request = request.copy()
     
     # Moving the portion of the path consumed by the current view, from the
     # PATH_INTO to the SCRIPT_NAME:
-    final_mount_point = mount_point or request.matched_url_regex
-    if isinstance(final_mount_point, basestring):
-        # It's already an string, so we just have to make sure it's valid:
-        if not new_request.path_info.startswith(final_mount_point):
-            raise ValueError("Path %s has not been consumed in PATH_INFO" %
-                             final_mount_point)
-    else:
-        # It's a regular expression:
-        match = final_mount_point.search(new_request.path_info[1:])
-        if not match:
-            regex = final_mount_point.pattern
-            raise ValueError("Path pattern %s has not been consumed in "
-                             "PATH_INFO" % regex)
-        final_mount_point = "/%s" % match.group()
-    new_request.path_info = new_request.path_info[len(final_mount_point):]
-    new_request.script_name = new_request.script_name + final_mount_point
+    if not new_request.path_info.startswith(mount_point):
+        raise ApplicationCallError("Path %s has not been consumed in PATH_INFO"
+                                   % mount_point)
+    new_request.path_info = new_request.path_info[len(mount_point):]
+    new_request.script_name = new_request.script_name + mount_point
     
     # If the user has been authenticated in Django, log him in the WSGI app:
     if request.user.is_authenticated():
@@ -107,16 +95,24 @@ def call_wsgi_app(wsgi_app, request, mount_point=None):
     return django_response
 
 
-def make_wsgi_view(wsgi_app, mount_point=None):
+def make_wsgi_view(wsgi_app):
     """
     Return a callable which can be used as a Django view powered by the
     ``wsgi_app``.
     
     :param wsgi_app: The WSGI which will run the view.
-    :return: The callable.
+    :return: The view callable.
     
     """
-    def view(request):
-        return call_wsgi_app(wsgi_app, request, mount_point)
+    
+    def view(request, wsgi_path):
+        # Calculating the path consumed by this view:
+        if not request.path_info.endswith(wsgi_path):
+            raise ApplicationCallError(
+                "The WSGI application %r cannot be mounted at %s because this "
+                "is not where PATH_INFO ends" % (wsgi_app, wsgi_path))
+        consumed_path = request.path_info[:-len(wsgi_path)]
+        return call_wsgi_app(wsgi_app, request, mount_point=consumed_path)
+    
     return view
 

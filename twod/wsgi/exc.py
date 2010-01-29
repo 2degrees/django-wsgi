@@ -14,23 +14,19 @@
 #
 ##############################################################################
 """
-URL definitions for the mock Django application.
+Exceptions raised by :mod:`twod.wsgi.`
 
 """
 
-from django.conf.urls.defaults import patterns
+class TwodWSGIException(Exception):
+    """Base class for exceptions raised by :mod:`twod.wsgi`."""
+    pass
 
-from twod.wsgi import make_wsgi_view
 
-from tests import MockApp
-from tests.fixtures.sampledjango import mock_view
+class ApplicationCallError(TwodWSGIException):
+    """
+    Exception raised when an embedded WSGI application was not called properly.
+    
+    """
+    pass
 
-app = make_wsgi_view(MockApp("206 One step at a time",
-                             [("X-SALUTATION", "Hey")]))
-
-urlpatterns = patterns('',
-    (r'^blog', mock_view),
-    (r'^admin', mock_view),
-    (r'^secret', mock_view),
-    (r"wsgi-view(/.*)?", app),
-    )

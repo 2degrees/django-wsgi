@@ -24,8 +24,10 @@ from nose.tools import eq_, ok_, assert_false, assert_raises
 
 from twod.wsgi import call_wsgi_app, make_wsgi_view
 from twod.wsgi.handler import TwodWSGIRequest
+from twod.wsgi.exc import ApplicationCallError
 
-from tests import BaseDjangoTestCase
+from tests import (BaseDjangoTestCase, MockApp, MockClosingApp, MockWriteApp,
+                   MockGeneratorApp)
 
 
 class TestCallWSGIApp(BaseDjangoTestCase):
@@ -75,7 +77,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         call_wsgi_app(app, request, "/admin")
         ok_("webob.adhoc_attrs" not in app.environ)
     
-    def test_mount_point_as_string(self):
+    def test_mount_point(self):
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/trac/wiki")
         request = make_request(**environ)
         # Running the app:
@@ -83,43 +85,16 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         call_wsgi_app(app, request, "/trac")
         eq_(app.environ['SCRIPT_NAME'], "/dev/trac")
         eq_(app.environ['PATH_INFO'], "/wiki")
-        
-    def test_mount_point_as_regex(self):
-        environ = complete_environ(SCRIPT_NAME="/dev",
-                                   PATH_INFO="/project5/trac/wiki")
-        request = make_request(**environ)
-        mount_point = compile_regex(r"^(?P<project>\w+)/trac")
-        # Running the app:
-        app = MockApp("200 OK", [])
-        call_wsgi_app(app, request, mount_point)
-        eq_(app.environ['SCRIPT_NAME'], "/dev/project5/trac")
-        eq_(app.environ['PATH_INFO'], "/wiki")
-        
-    def test_implied_mount_point(self):
-        """The mount point must be implied by the view's path."""
-        environ = complete_environ(SCRIPT_NAME="/dev",
-                                   PATH_INFO="/project5/trac/wiki")
-        request = make_request(**environ)
-        # Forging the matched URL:
-        request.matched_url_regex = compile_regex(r"^(?P<project>\w+)/trac")
-        # Running the app:
-        app = MockApp("200 OK", [])
-        call_wsgi_app(app, request)
-        eq_(app.environ['SCRIPT_NAME'], "/dev/project5/trac")
-        eq_(app.environ['PATH_INFO'], "/wiki")
     
     def test_incorrect_mount_point(self):
         environ = complete_environ(SCRIPT_NAME="/dev",
                                    PATH_INFO="/trac/wiki")
         request = make_request(**environ)
-        mount_point_string = "/bugzilla"
-        mount_point_regex = compile_regex(r"/bugzilla")
+        mount_point = "/bugzilla"
         # Running the app:
         app = MockApp("200 OK", [])
-        assert_raises(ValueError, call_wsgi_app, app, request,
-                          mount_point_string)
-        assert_raises(ValueError, call_wsgi_app, app, request,
-                          mount_point_regex)
+        assert_raises(ApplicationCallError, call_wsgi_app, app, request,
+                      mount_point)
     
     def test_http_status_code(self):
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/trac/wiki")
@@ -278,93 +253,42 @@ class TestWSGIView(BaseDjangoTestCase):
     
     """
     
-    def test_it(self):
+    def test_right_path(self):
+        """
+        The WSGI application view must work when called with the right path.
+        
+        """
         # Loading a WSGI-powered Django view:
         headers = [("X-SALUTATION", "Hey")]
         app = MockApp("206 One step at a time", headers)
-        django_view = make_wsgi_view(app, "/blog")
+        django_view = make_wsgi_view(app)
         # Running a request:
-        environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
+        environ = complete_environ(SCRIPT_NAME="/dev",
+                                   PATH_INFO="/app1/wsgi-view/foo/bar")
         request = make_request(**environ)
         # Checking the response:
-        django_response = django_view(request)
+        django_response = django_view(request, "/foo/bar")
         eq_(django_response.status_code, 206)
-        ok_(("X-SALUTATION", "Hey") ==
-                        django_response._headers['x-salutation'])
-
-
-#{ Mock definitions
-
-
-class MockApp(object):
-    """
-    Mock WSGI application.
+        eq_(("X-SALUTATION", "Hey"), django_response._headers['x-salutation'])
+        eq_(app.environ['PATH_INFO'], "/foo/bar")
+        eq_(app.environ['SCRIPT_NAME'], "/dev/app1/wsgi-view")
     
-    """
-    
-    def __init__(self, status, headers):
-        self.status = status
-        self.headers = headers
-
-    def __call__(self, environ, start_response):
-        self.environ = environ
-        start_response(self.status, self.headers)
-        return ["body"]
-
-
-class MockGeneratorApp(MockApp):
-    """
-    Mock WSGI application that returns an iterator.
-    
-    """
-
-    def __call__(self, environ, start_response):
-        self.environ = environ
-        start_response(self.status, self.headers)
-        def gen():
-            yield "body"
-            yield " as"
-            yield " iterable"
-        return gen()
-
-
-class MockWriteApp(MockApp):
-    """
-    Mock WSGI app which uses the write() function.
-    
-    """
-    
-    def __call__(self, environ, start_response):
-        self.environ = environ
-        write = start_response(self.status, self.headers)
-        write( "body")
-        write(" as")
-        write(" iterable")
-        return []
-
-
-class MockClosingApp(MockApp):
-    """Mock WSGI app whose response contains a close() method."""
-    
-    def __init__(self, *args, **kwargs):
-        super(MockClosingApp, self).__init__(*args, **kwargs)
-        self.app_iter = ClosingAppIter()
-    
-    def __call__(self, environ, start_response):
-        body = super(MockClosingApp, self).__call__(environ,start_response)
-        self.app_iter.extend(body)
-        return self.app_iter
-
-
-class ClosingAppIter(list):
-    """Mock response iterable with a close() method."""
-    
-    def __init__(self, *args, **kwargs):
-        super(ClosingAppIter, self).__init__(*args, **kwargs)
-        self.closed = False
-    
-    def close(self):
-        self.closed = True
+    def test_not_final_path(self):
+        """
+        The path to be consumed by the WSGI app must be the end of the original
+        PATH_INFO.
+        
+        """
+        # Loading a WSGI-powered Django view:
+        headers = [("X-SALUTATION", "Hey")]
+        app = MockApp("206 One step at a time", headers)
+        django_view = make_wsgi_view(app)
+        # Running a request:
+        environ = complete_environ(SCRIPT_NAME="/dev",
+                                   PATH_INFO="/app1/wsgi-view/foo/bar")
+        request = make_request(**environ)
+        # Checking the response. Note "/foo" is NOT the end of PATH_INFO:
+        assert_raises(ApplicationCallError, django_view, request, "/foo")
 
 
 #{ Test utilities
