@@ -212,12 +212,11 @@ class TestCallWSGIApp(BaseDjangoTestCase):
     
     def test_string_as_response(self):
         app = MockApp("200 It is OK", [("X-HEADER", "Foo")])
-        django_view = make_wsgi_view(app, "/blog")
         # Running a request:
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
         request = make_request(**environ)
+        django_response = call_wsgi_app(app, request, "/blog")
         # Checking the response:
-        django_response = django_view(request)
         http_response = (
             "X-HEADER: Foo\n"
             "Content-Type: text/html; charset=utf-8\n"
@@ -228,12 +227,11 @@ class TestCallWSGIApp(BaseDjangoTestCase):
     
     def test_iterable_as_response(self):
         app = MockGeneratorApp("200 It is OK", [("X-HEADER", "Foo")])
-        django_view = make_wsgi_view(app, "/blog")
         # Running a request:
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
         request = make_request(**environ)
+        django_response = call_wsgi_app(app, request, "/blog")
         # Checking the response:
-        django_response = django_view(request)
         assert_false(django_response._is_string)
         ok_(django_response.has_header("X-HEADER"))
         http_response = (
@@ -246,12 +244,11 @@ class TestCallWSGIApp(BaseDjangoTestCase):
     
     def test_write_response(self):
         app = MockWriteApp("200 It is OK", [("X-HEADER", "Foo")])
-        django_view = make_wsgi_view(app, "/blog")
         # Running a request:
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
         request = make_request(**environ)
+        django_response = call_wsgi_app(app, request, "/blog")
         # Checking the response:
-        django_response = django_view(request)
         assert_false(django_response._is_string)
         ok_(django_response.has_header("X-HEADER"))
         http_response = (
@@ -265,11 +262,10 @@ class TestCallWSGIApp(BaseDjangoTestCase):
     def test_closure_response(self):
         """The .close() method in the response (if any) must be kept."""
         app = MockClosingApp("200 It is OK", [])
-        django_view = make_wsgi_view(app, "/blog")
         # Running a request:
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
         request = make_request(**environ)
-        django_response = django_view(request)
+        django_response = call_wsgi_app(app, request, "/blog")
         # Checking the .close() call:
         assert_false(app.app_iter.closed)
         django_response.close()
