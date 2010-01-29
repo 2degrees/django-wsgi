@@ -45,39 +45,42 @@ def call_wsgi_app(wsgi_app, request, mount_point=None):
     in Django will be used -- This is the desired behavior is most situations.
     
     """
-    environ = request.environ.copy()
+    new_request = request.copy()
     
     # Moving the portion of the path consumed by the current view, from the
     # PATH_INTO to the SCRIPT_NAME:
     final_mount_point = mount_point or request.matched_url_regex
     if isinstance(final_mount_point, basestring):
         # It's already an string, so we just have to make sure it's valid:
-        if not environ['PATH_INFO'].startswith(final_mount_point):
+        if not new_request.path_info.startswith(final_mount_point):
             raise ValueError("Path %s has not been consumed in PATH_INFO" %
                              final_mount_point)
     else:
         # It's a regular expression:
-        match = final_mount_point.search(environ['PATH_INFO'][1:])
+        match = final_mount_point.search(new_request.path_info[1:])
         if not match:
             regex = final_mount_point.pattern
             raise ValueError("Path pattern %s has not been consumed in "
                              "PATH_INFO" % regex)
         final_mount_point = "/%s" % match.group()
-    environ['PATH_INFO'] = environ['PATH_INFO'][len(final_mount_point):]
-    environ['SCRIPT_NAME'] = environ['SCRIPT_NAME'] + final_mount_point
+    new_request.path_info = new_request.path_info[len(final_mount_point):]
+    new_request.script_name = new_request.script_name + final_mount_point
     
     # If the user has been authenticated in Django, log him in the WSGI app:
     if request.user.is_authenticated():
-        environ['REMOTE_USER'] = request.user.username
+        new_request.remote_user = request.user.username
     
     # Cleaning the routing_args, if any. The application should have its own
     # arguments, without relying on any arguments from a parent application:
-    if "wsgiorg.routing_args" in environ:
-        del environ['wsgiorg.routing_args']
+    if "wsgiorg.routing_args" in request.environ:
+        del new_request.environ['wsgiorg.routing_args']
+    # And the same for the WebOb ad-hoc attributes:
+    if "webob.adhoc_attrs" in request.environ:
+        del new_request.environ['webob.adhoc_attrs']
     
     # Calling the WSGI application and getting its response:
     response_wrapper = _ResponseStarter()
-    wsgi_response = wsgi_app(environ, response_wrapper)
+    wsgi_response = wsgi_app(new_request.environ, response_wrapper)
     body = chain(response_wrapper.body, wsgi_response)
     
     # Turning its response into a Django response:

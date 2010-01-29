@@ -18,6 +18,7 @@ Tests for the use of WSGI applications within Django.
 
 """
 from re import compile as compile_regex
+from StringIO import StringIO
 
 from nose.tools import eq_, ok_, assert_false, assert_raises
 
@@ -86,6 +87,20 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         app = MockApp("200 OK", [])
         call_wsgi_app(app, request, "/admin")
         ok_("wsgiorg.routing_args" not in app.environ)
+    
+    def test_webob_adhoc_attrs_are_removed(self):
+        """WebOb's ad-hoc attributes must be removed."""
+        environ = {
+            'PATH_INFO': "/admin/models",
+            'wsgiorg.routing_args': ((), {}),
+            'webob.adhoc_attrs': {'foo': "bar"},
+            }
+        environ = complete_environ(**environ)
+        request = make_request(**environ)
+        # Running the app:
+        app = MockApp("200 OK", [])
+        call_wsgi_app(app, request, "/admin")
+        ok_("webob.adhoc_attrs" not in app.environ)
     
     def test_mount_point_as_string(self):
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/trac/wiki")
@@ -370,6 +385,11 @@ def complete_environ(**environ):
     full_environ = {
         'REQUEST_METHOD': "GET",
         'SERVER_NAME': "example.org",
+        'SERVER_PORT': "80",
+        'SERVER_PROTOCOL': "HTTP/1.1",
+        'HOST': "example.org",
+        'wsgi.input': StringIO(""),
+        'wsgi.url_scheme': "http",
         }
     full_environ.update(environ)
     return full_environ
