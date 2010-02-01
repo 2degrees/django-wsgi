@@ -93,17 +93,19 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         assert_raises(ApplicationCallError, call_wsgi_app, app, request,
                       mount_point)
     
-    def test_http_status_code(self):
+    def test_http_status(self):
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/trac/wiki")
         request = make_request(**environ)
         # Running the app and make a valid request:
-        app_ok = MockApp("200 OK", [])
+        app_ok = MockApp("200 Alright", [])
         django_response_ok = call_wsgi_app(app_ok, request, "/trac")
         eq_(200, django_response_ok.status_code)
+        eq_("Alright", django_response_ok.status_reason)
         # Running the app and make an invalid request:
         app_bad = MockApp("403 What are you trying to do?", [])
         django_response_bad = call_wsgi_app(app_bad, request, "/trac")
         eq_(403, django_response_bad.status_code)
+        eq_("What are you trying to do?", django_response_bad.status_reason)
     
     def test_headers_are_copied_over(self):
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/trac/wiki")
