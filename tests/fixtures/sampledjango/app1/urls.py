@@ -28,9 +28,12 @@ from tests.fixtures.sampledjango import mock_view
 app = make_wsgi_view(MockApp("206 One step at a time",
                              [("X-SALUTATION", "Hey")]))
 
+ok_app = make_wsgi_view(MockApp("200 OK", [("X-SALUTATION", "Hey")]))
+
 urlpatterns = patterns('',
     (r'^blog', mock_view),
     (r'^admin', mock_view),
     (r'^secret', mock_view),
+    (r"wsgi-view-ok(/.*)?", ok_app),
     (r"wsgi-view(/.*)?", app),
     )

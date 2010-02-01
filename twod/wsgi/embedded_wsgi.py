@@ -20,8 +20,7 @@ Utilities to use WSGI applications within Django.
 
 from Cookie import SimpleCookie
 
-from django.http import HttpResponse
-
+from twod.wsgi import TwodResponse
 from twod.wsgi.exc import ApplicationCallError
 
 
@@ -67,11 +66,10 @@ def call_wsgi_app(wsgi_app, request, mount_point):
     
     # Calling the WSGI application and getting its response:
     (status, headers, body) = new_request.call_application(wsgi_app)
-    status = int(status[:3])
     
     # Turning its response into a Django response:
     cookies = SimpleCookie()
-    django_response = HttpResponse(body, status=status)
+    django_response = TwodResponse(body, status=status)
     for (header, value) in headers:
         if header.upper() == "SET-COOKIE":
             if isinstance(value, unicode):

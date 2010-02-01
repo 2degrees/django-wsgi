@@ -17,6 +17,7 @@
 Test suite for :mod:`twod.wsgi`.
 
 """
+from StringIO import StringIO
 import logging
 import os
 
@@ -152,5 +153,38 @@ class ClosingAppIter(list):
     def close(self):
         self.closed = True
 
+
+class MockStartResponse(object):
+    """Mock start_response() callable which keeps the arguments it receives."""
+    
+    def __init__(self):
+        self.status = None
+        self.response_headers = None
+        self.exc_info = None
+        self.called = False
+    
+    def __call__(self, status, response_headers, exc_info=None):
+        self.status = status
+        self.response_headers = response_headers
+        self.exc_info = exc_info
+        self.called = True
+
+
+def complete_environ(**environ):
+    """
+    Add the missing items in ``environ``.
+    
+    """
+    full_environ = {
+        'REQUEST_METHOD': "GET",
+        'SERVER_NAME': "example.org",
+        'SERVER_PORT': "80",
+        'SERVER_PROTOCOL': "HTTP/1.1",
+        'HOST': "example.org",
+        'wsgi.input': StringIO(""),
+        'wsgi.url_scheme': "http",
+        }
+    full_environ.update(environ)
+    return full_environ
 
 #}

@@ -17,9 +17,6 @@
 Tests for the use of WSGI applications within Django.
 
 """
-from re import compile as compile_regex
-from StringIO import StringIO
-
 from nose.tools import eq_, ok_, assert_false, assert_raises
 
 from twod.wsgi import call_wsgi_app, make_wsgi_view
@@ -27,7 +24,7 @@ from twod.wsgi.handler import TwodWSGIRequest
 from twod.wsgi.exc import ApplicationCallError
 
 from tests import (BaseDjangoTestCase, MockApp, MockClosingApp, MockWriteApp,
-                   MockGeneratorApp)
+                   MockGeneratorApp, complete_environ)
 
 
 class TestCallWSGIApp(BaseDjangoTestCase):
@@ -119,6 +116,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         expected_headers = {
             'x-foo': ("X-Foo", "bar"),
             'content-type': ("Content-Type", "text/plain"),
+            'x-actual-status-reason': ("X-Actual-Status-Reason", "200 OK"),
             }
         # Running the app:
         app = MockApp("200 OK", headers)
@@ -195,6 +193,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         http_response = (
             "X-HEADER: Foo\n"
             "Content-Type: text/html; charset=utf-8\n"
+            "X-Actual-Status-Reason: 200 It is OK\n"
             "\n"
             "body"
             )
@@ -212,6 +211,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         http_response = (
             "X-HEADER: Foo\n"
             "Content-Type: text/html; charset=utf-8\n"
+            "X-Actual-Status-Reason: 200 It is OK\n"
             "\n"
             "body as iterable"
             )
@@ -229,6 +229,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         http_response = (
             "X-HEADER: Foo\n"
             "Content-Type: text/html; charset=utf-8\n"
+            "X-Actual-Status-Reason: 200 It is OK\n"
             "\n"
             "body as iterable"
             )
@@ -308,24 +309,6 @@ def make_request(authenticated=False, **environ):
     request = TwodWSGIRequest(environ)
     request.user = MockDjangoUser(authenticated)
     return request
-
-
-def complete_environ(**environ):
-    """
-    Add the missing items in ``environ``.
-    
-    """
-    full_environ = {
-        'REQUEST_METHOD': "GET",
-        'SERVER_NAME': "example.org",
-        'SERVER_PORT': "80",
-        'SERVER_PROTOCOL': "HTTP/1.1",
-        'HOST': "example.org",
-        'wsgi.input': StringIO(""),
-        'wsgi.url_scheme': "http",
-        }
-    full_environ.update(environ)
-    return full_environ
 
 
 #}

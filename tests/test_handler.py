@@ -22,12 +22,13 @@ from urllib import urlencode
 
 from nose.tools import eq_, ok_, assert_false, assert_not_equal
 from webob import Request
-from django.core.handlers.wsgi import WSGIRequest, WSGIHandler
+from django.core.handlers.wsgi import WSGIRequest
 
 from twod.wsgi import DjangoApplication
-from twod.wsgi.handler import TwodWSGIRequest
+from twod.wsgi.handler import (TwodWSGIRequest, TwodResponse,
+                               _StartResponseWrapper)
 
-from tests import BaseDjangoTestCase
+from tests import BaseDjangoTestCase, MockStartResponse, complete_environ
 
 
 class TestRequest(BaseDjangoTestCase):
@@ -175,6 +176,68 @@ class TestRequest(BaseDjangoTestCase):
     #}
 
 
+class TestResponse(BaseDjangoTestCase):
+    """Tests for :class:`TwodResponse`."""
+    
+    def test_status_phrase_is_kept(self):
+        """
+        Unlike Django's, 2degrees' Response objects must kept the status phrase.
+        
+        """
+        body = "this is the body"
+        status = "200 Everything's gonna be alright"
+        response = TwodResponse(body, status=status)
+        # The original status code should remain integer:
+        eq_(response.status_code, 200)
+        # But the reason phrase must still be available:
+        eq_(response.status_reason, status[4:])
+        # And both must be included in the actual response:
+        expected_response = (
+            "Content-Type: text/html; charset=utf-8\n"
+            "X-Actual-Status-Reason: %s\n"
+            "\n"
+            "%s"
+            ) % (status, body)
+        eq_(expected_response, str(response))
+    
+    def test_backwards_compatibility(self):
+        """
+        The response must behave like Django's unless explicitly told otherwise.
+        
+        """
+        body = "this is the body"
+        status = 200
+        response = TwodResponse(body, status=status)
+        # The original status code should remain integer:
+        eq_(response.status_code, 200)
+        # But the reason phrase must still be available:
+        eq_(response.status_reason, None)
+        # And both must be included in the actual response:
+        expected_response = (
+            "Content-Type: text/html; charset=utf-8\n"
+            "\n"
+            "%s"
+            ) % body
+        eq_(expected_response, str(response))
+    
+    def test_status_reason_is_taken_when_available(self):
+        """
+        The status reason phrase must be taken when it's really set.
+        
+        """
+        body = "this is the body"
+        # Testing a status code as string, but which doesn't have a reason:
+        status1 = "200 "
+        response1 = TwodResponse(body, status=status1)
+        eq_(response1.status_code, 200)
+        eq_(response1.status_reason, None)
+        # Testing a status code as string which has a reason:
+        status2 = "200 That is right"
+        response2 = TwodResponse(body, status=status2)
+        eq_(response2.status_code, 200)
+        eq_(response2.status_reason, status2[4:])
+
+
 class TestWSGIHandler(BaseDjangoTestCase):
     """Tests for :class:`DjangoApplication`."""
     
@@ -196,6 +259,72 @@ class TestWSGIHandler(BaseDjangoTestCase):
             pass
         
         ok_(isinstance(self.handler.request, TwodWSGIRequest))
+    
+    def test_actual_reason_phrase(self):
+        """It must use the status phrase set by the Django response, if any."""
+        environ = complete_environ(PATH_INFO="/app1/wsgi-view/")
+        start_response = MockStartResponse()
+        
+        self.handler(environ, start_response)
+        
+        eq_(start_response.status, "206 One step at a time")
+        
+        eq_(len(start_response.response_headers), 3)
+        eq_(start_response.response_headers[0][0], "Vary")
+        eq_(start_response.response_headers[1][0], "X-SALUTATION")
+        eq_(start_response.response_headers[2][0], "Content-Type")
+    
+    def test_no_actual_reason_phrase(self):
+        """It must not replace the status reason if a custom one was not set."""
+        environ = complete_environ(PATH_INFO="/app1/wsgi-view-ok/")
+        start_response = MockStartResponse()
+        
+        self.handler(environ, start_response)
+        
+        eq_(start_response.status, "200 OK")
+        
+        eq_(len(start_response.response_headers), 3)
+        eq_(start_response.response_headers[0][0], "Vary")
+        eq_(start_response.response_headers[1][0], "X-SALUTATION")
+        eq_(start_response.response_headers[2][0], "Content-Type")
+
+
+#{ Tests for internal stuff
+
+
+class TestStartResponse(object):
+    """Tests for :class:`_StartResponseWrapper`."""
+    
+    def setup(self):
+        self.original_sr = MockStartResponse()
+        self.sr_wrapper = _StartResponseWrapper(self.original_sr)
+    
+    def test_no_actual_phrase(self):
+        """Nothing should be changed if there's no actual status reason."""
+        status = "200 Sweet"
+        response_headers = (
+            ("X-Foo", "Whatever"),
+            ("X-Bar", "Somehow"),
+            )
+        self.sr_wrapper(status, response_headers)
+        ok_(self.original_sr.called)
+        eq_(self.original_sr.status, status)
+        eq_(self.original_sr.response_headers, response_headers)
+        eq_(self.original_sr.exc_info, None)
+    
+    def test_with_actual_phrase(self):
+        """The status reason must be replaced if it's set in the headers."""
+        actual_status = "200 Cool"
+        response_headers = (
+            ("X-Foo", "Whatever"),
+            ("X-Actual-Status-Reason", actual_status),
+            )
+        self.sr_wrapper("200 Sweet", response_headers)
+        ok_(self.original_sr.called)
+        eq_(self.original_sr.status, actual_status)
+        eq_(len(self.original_sr.response_headers), 1)
+        eq_(self.original_sr.response_headers[0], ("X-Foo", "Whatever"))
+        eq_(self.original_sr.exc_info, None)
 
 
 #{ Test utilities
