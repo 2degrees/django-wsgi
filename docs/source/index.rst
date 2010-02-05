@@ -8,7 +8,7 @@
 **twod.wsgi** unlocks Django applications so developers can take advantage of
 the `wealth of existing WSGI software
 <http://pypi.python.org/pypi?%3Aaction=search&term=wsgi>`_, as the other
-mainstream Python frameworks do. It won't break existing applications because
+popular Python frameworks do. It won't break existing applications because
 it's 100% compatible with Django and you can start implementing the functionality
 offered by this library progressively. It should be really easy to get started,
 particularly for developers who are familiar with frameworks like Pylons or

@@ -16,13 +16,13 @@ only affect the Django community: The wider Python Web development community
 could be benefiting from reusable components written by Django users, who
 represent an important portion of said community.
 
-It the beginning there was no support at all, but nowadays compliance is nearly
-complete at the bare minimum. This has been pointed many times, by known members
-of both WSGI [#django_wsgi]_ and Django [#django_people]_ communities.
+In the beginning there was no support at all and nowadays compliance is nearly
+complete at the bare minimum. This has been pointed out many times, by known
+members of both WSGI [#django_wsgi]_ and Django [#django_people]_ communities.
 
 WSGI is all about **interoperability** and that leads to **reusability**.
 Reusability beyond `more of the same <http://pinaxproject.com/>`_: From
-completely independent projects. And `cooperation is the key
+absolutely independent projects. And `cooperation is the key
 <http://compoundthinking.com/blog/index.php/2009/02/04/wsgi-and-cooperation/>`_.
 
 *twod.wsgi*'s aim is to be the "cooperation bridge" between Django and WSGI, until
