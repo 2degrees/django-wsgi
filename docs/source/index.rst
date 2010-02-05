@@ -8,17 +8,17 @@
 **twod.wsgi** unlocks Django applications so developers can take advantage of
 the `wealth of existing WSGI software
 <http://pypi.python.org/pypi?%3Aaction=search&term=wsgi>`_, as the other
-popular Python frameworks do. It won't break existing applications because
-it's 100% compatible with Django and you can start implementing the functionality
+popular Python frameworks do. It won't break you existing Django applications because
+it's 100% compatible with Django and you can start using the functionality
 offered by this library progressively. It should be really easy to get started,
 particularly for developers who are familiar with frameworks like Pylons or
 TurboGears.
 
-Among many other things, one of the components alone solves `well-known
-limitations in Django
+Among many other things, one of the components alone provides `solutions to
+some enterprise requirements for Django
 <http://groups.google.com/group/django-developers/browse_thread/thread/c89e028a536514d3>`_:
 
-- It's now possible to run code on startup time, in an straightforward yet
+- It's now possible to run code at startup time, in an straightforward yet
   extremely flexible fashion, which will also work on development servers if you
   want it to -- not only when deployed on a production server.
 - You can now stop using a Python module to store your application settings, in
@@ -29,8 +29,9 @@ limitations in Django
   way you may do it on production servers.
 
 And this is just the tip of the iceberg. By improving Django's interoperability,
-you gain the ability to integrate more third party software which is not available
-for Django, or simply use a component which you think outperforms Django's.
+you gain the ability to rapidly integrate many third party software with Django,
+or simply use a component which you think outperforms Django's current
+implementation.
 
 Finally, it's worth mentioning that:
 
@@ -40,9 +41,8 @@ Finally, it's worth mentioning that:
   <http://groups.google.com/group/django-developers/browse_thread/thread/08c7ffeee7b9343c>`_.
 - Our long-term goal is to see these improvements in Django itself -- Either with
   our implementation or someone else's. Before deciding to start an independent
-  project, we had already offered our help to the Django community (at least `twice
-  <http://alexgaynor.net/2010/jan/11/hot-django-wsgi-action-announcing-django-wsgi/>`_)
-  and the offer still stands.
+  project, we had already offered our help to people within the Django community
+  working towards similar aims and the offer still stands.
 - It is known to work with Django 1.1.1 and Python 2.5, and we expect it to
   work with Django 1.1-1.2 and Python 2.4-2.6 too -- Please let us know if it
   doesn't.

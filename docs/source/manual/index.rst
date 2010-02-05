@@ -17,11 +17,11 @@ could be benefiting from reusable components written by Django users, who
 represent an important portion of said community.
 
 In the beginning there was no support at all and nowadays compliance is nearly
-complete at the bare minimum. This has been pointed out many times, by known
+complete at the bare minimum level. This has been pointed out many times, by known
 members of both WSGI [#django_wsgi]_ and Django [#django_people]_ communities.
 
-WSGI is all about **interoperability** and that leads to **reusability**.
-Reusability beyond `more of the same <http://pinaxproject.com/>`_: From
+WSGI is all about **interoperability** and that leads to **reusability**, in this
+sense, reusability beyond `more of the same <http://pinaxproject.com/>`_: From
 absolutely independent projects. And `cooperation is the key
 <http://compoundthinking.com/blog/index.php/2009/02/04/wsgi-and-cooperation/>`_.
 
