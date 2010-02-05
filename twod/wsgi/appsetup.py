@@ -45,34 +45,34 @@ def wsgify_django(global_config, **local_conf):
     :rtype: :class:`~twod.wsgi.request.DjangoApplication`
     
     """
-    _set_up_settings(local_conf)
+    _set_up_settings(global_config, local_conf)
     return DjangoApplication()
 
 
 def load_django(config_uri):
     """
-    Load the PasteDeploy settings into the Django settings module.
+    Load the PasteDeploy options into the Django settings module.
     
     :raises ImportError: If the Django settings module cannot be imported.
-    :raises ValueError: If ``local_conf`` contains a Django setting which is
+    :raises ValueError: If an options attempts to set a Django setting which is
         not supported.
     :raises ValueError: If the ``django_settings_module`` directive is not set.
     :raises ValueError: If Django's ``DEBUG`` is set instead of Paste's
         ``debug``.
     
     """
-    additional_settings = appconfig(config_uri)
-    _set_up_settings(additional_settings)
+    all_options = appconfig(config_uri)
+    (global_config, local_conf) = _segregate_options(all_options)
+    
+    _set_up_settings(global_config, local_conf)
 
 
-def _set_up_settings(additional_settings):
+def _set_up_settings(global_conf, local_conf):
     """
-    Add the objects in ``additional_settings`` to the
-    ``django_settings_module`` module.
+    Add the PasteDeploy options to the DJANGO_SETTINGS_MODULE module.
     
     """
-    django_settings_module = additional_settings.pop("django_settings_module",
-                                                     None)
+    django_settings_module = global_conf.get("django_settings_module")
     if not django_settings_module:
         raise ValueError('The "django_settings_module" directive is not set')
     
@@ -83,17 +83,16 @@ def _set_up_settings(additional_settings):
     # We need the module name for __import__ to work properly:
     # http://stackoverflow.com/questions/211100/pythons-import-doesnt-work-as-expected
     module = django_settings_module.split(".")[-1]
-    settings_module = __import__(django_settings_module, additional_settings,
-                                 fromlist=[module])
+    settings_module = __import__(django_settings_module, fromlist=[module])
     
     if hasattr(settings_module, "DEBUG"):
         raise ValueError('Module %s must not define "DEBUG". It must be set '
                          'in the PasteDesploy configuration file as "debug".' %
                          django_settings_module)
     
-    _convert_settings(additional_settings)
+    options = _convert_options(global_conf, local_conf)
     
-    for (setting_name, setting_value) in additional_settings.items():
+    for (setting_name, setting_value) in options.items():
         if not hasattr(settings_module, setting_name):
             # The name is not used; let's set it:
             setattr(settings_module, setting_name, setting_value)
@@ -105,6 +104,37 @@ def _set_up_settings(additional_settings):
             # The name is already used and it's not a list; let's warn the user:
             _LOGGER.warn('"%s" will not be overridden in %s', setting_name,
                          django_settings_module)
+
+
+#{ Reserved options handling
+
+
+_RESERVED_OPTIONS = frozenset([
+    "debug",
+    "django_settings_module",
+    "twod.booleans",
+    "twod.integers",
+    "twod.lists",
+    "twod.nested_lists",
+    ])
+
+
+def _segregate_options(options):
+    """
+    Extract the reserved options from ``options`` and returned separated from
+    the rest of the options.
+    
+    """
+    reserved_options = {}
+    free_options = {}
+    
+    for (option_name, option_value) in options.items():
+        if option_name in _RESERVED_OPTIONS:
+            reserved_options[option_name] = option_value
+        else:
+            free_options[option_name] = option_value
+    
+    return (reserved_options, free_options)
 
 
 #{ Type casting
@@ -178,52 +208,60 @@ _DJANGO_UNSUPPORTED_SETTINGS = frozenset([
     ])
 
 
-def _convert_settings(settings):
+def _convert_options(global_conf, local_conf):
     """
-    Convert ``settings`` into the right types.
+    Build the final options based on PasteDeploy's ``global_conf`` and
+    ``local_conf``.
     
     """
     # First of all, let's make sure Django will use Paste's "debug" value:
-    if "DEBUG" in settings:
+    if "DEBUG" in global_conf or "DEBUG" in local_conf:
         raise ValueError("Do not set Django's DEBUG in the configuration file; "
                          "use Paste's 'debug' instead")
-    if "debug" not in settings:
-        raise ValueError("Paste's 'debug' directive must be set in the "
+    if "debug" not in global_conf:
+        raise ValueError("Paste's 'debug' option must be set in the "
                          "configuration file")
-    settings['DEBUG'] = settings['debug']
+    
+    local_conf['DEBUG'] = global_conf['debug']
     
     # Now it's safe to move on with the type casting:
     
-    custom_booleans = aslist(settings.get("twod.booleans", ""))
-    custom_integers = aslist(settings.get("twod.integers", ""))
-    custom_tuples = aslist(settings.get("twod.tuples", ""))
-    custom_nested_tuples = aslist(settings.get("twod.nested_tuples", ""))
+    custom_booleans = aslist(global_conf.get("twod.booleans", ""))
+    custom_integers = aslist(global_conf.get("twod.integers", ""))
+    custom_tuples = aslist(global_conf.get("twod.tuples", ""))
+    custom_nested_tuples = aslist(global_conf.get("twod.nested_tuples", ""))
     
     booleans = _DJANGO_BOOLEANS | frozenset(custom_booleans)
     integers = _DJANGO_INTEGERS | frozenset(custom_integers)
     tuples = _DJANGO_TUPLES | frozenset(custom_tuples)
     nested_tuples = _DJANGO_NESTED_TUPLES | frozenset(custom_nested_tuples)
     
-    for (setting_name, setting_value) in settings.items():
-        if setting_name in booleans:
-            settings[setting_name] = asbool(setting_value)
-        elif setting_name in integers:
-            settings[setting_name] = asint(setting_value)
-        elif setting_name in tuples:
-            settings[setting_name] = tuple(aslist(setting_value))
-        elif setting_name in nested_tuples:
+    options = {}
+    for (option_name, option_value) in local_conf.items():
+        if option_name in booleans:
+            options[option_name] = asbool(option_value)
+        elif option_name in integers:
+            options[option_name] = asint(option_value)
+        elif option_name in tuples:
+            options[option_name] = tuple(aslist(option_value))
+        elif option_name in nested_tuples:
             nested_tuple = tuple(
                 tuple((val.strip()) for val in tuple_.strip().split(";") if val)
-                for tuple_ in setting_value.splitlines()
+                for tuple_ in option_value.splitlines()
                 )
-            settings[setting_name] = nested_tuple
-        elif setting_name in _DJANGO_UNSUPPORTED_SETTINGS:
-            raise ValueError("Setting %s is not (yet) supported; "
-                             "you have to define it in your settings module." %
-                             setting_name)
+            options[option_name] = nested_tuple
+        elif option_name in _DJANGO_UNSUPPORTED_SETTINGS:
+            raise ValueError("Django setting %s is not (yet) supported; "
+                             "you have to define it in your options module." %
+                             option_name)
+        else:
+            # Store the option as an string:
+            options[option_name] = option_value
     
     # We should not import a module with "__file__" as a global variable:
-    settings['paste_configuration_file'] = settings.pop("__file__", None)
+    options['paste_configuration_file'] = global_conf.get("__file__")
+    
+    return options
 
 
 #}
