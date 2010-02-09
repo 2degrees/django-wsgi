@@ -199,6 +199,8 @@ _DJANGO_NESTED_TUPLES = frozenset([
     "ADMINS",
     ])
 
+_DJANGO_DICTIONARIES = frozenset(["DATABASE_OPTIONS"])
+
 # TODO: The following settings should be supported:
 _DJANGO_UNSUPPORTED_SETTINGS = frozenset([
     "FILE_UPLOAD_PERMISSIONS",
@@ -230,11 +232,13 @@ def _convert_options(global_conf, local_conf):
     custom_integers = aslist(global_conf.get("twod.integers", ""))
     custom_tuples = aslist(global_conf.get("twod.tuples", ""))
     custom_nested_tuples = aslist(global_conf.get("twod.nested_tuples", ""))
+    custom_dictionaries = aslist(global_conf.get("twod.dictionaries", ""))
     
     booleans = _DJANGO_BOOLEANS | frozenset(custom_booleans)
     integers = _DJANGO_INTEGERS | frozenset(custom_integers)
     tuples = _DJANGO_TUPLES | frozenset(custom_tuples)
     nested_tuples = _DJANGO_NESTED_TUPLES | frozenset(custom_nested_tuples)
+    dictionaries = _DJANGO_DICTIONARIES | frozenset(custom_dictionaries)
     
     options = {}
     for (option_name, option_value) in local_conf.items():
@@ -250,6 +254,13 @@ def _convert_options(global_conf, local_conf):
                 for tuple_ in option_value.splitlines()
                 )
             options[option_name] = nested_tuple
+        elif option_name in dictionaries:
+            lines = option_value.splitlines()
+            items = [option.strip().split("=", 1) for option in lines]
+            dictionary = dict(
+                (key.strip(), value.strip()) for (key, value) in items
+                )
+            options[option_name] = dictionary
         elif option_name in _DJANGO_UNSUPPORTED_SETTINGS:
             raise ValueError("Django setting %s is not (yet) supported; "
                              "you have to define it in your options module." %

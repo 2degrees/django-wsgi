@@ -24,7 +24,8 @@ from django.core.handlers.wsgi import WSGIHandler
 
 from twod.wsgi.appsetup import (wsgify_django, load_django, _segregate_options,
     _set_up_settings, _convert_options, _DJANGO_BOOLEANS, _DJANGO_INTEGERS,
-    _DJANGO_NESTED_TUPLES, _DJANGO_TUPLES, _DJANGO_UNSUPPORTED_SETTINGS)
+    _DJANGO_NESTED_TUPLES, _DJANGO_TUPLES, _DJANGO_DICTIONARIES,
+    _DJANGO_UNSUPPORTED_SETTINGS)
 
 from tests import BaseDjangoTestCase
 
@@ -299,6 +300,35 @@ class TestSettingsConvertion(object):
         eq_(settings['my_nested_tuple'], nested_items)
         # "twod.nested_tuples" should have not been added:
         assert_false("twod.nested_tuples" in settings)
+    
+    def test_official_dictionaries(self):
+        """Django's dictionary settings must be converted."""
+        items = ("foo = bar", "baz=abc", " xyz = mno ")
+        dict_items = {'foo': "bar", 'baz': "abc", 'xyz': "mno"}
+        
+        for setting_name in _DJANGO_DICTIONARIES:
+            global_conf = {'debug': "yes"}
+            local_conf = {setting_name: "\n    ".join(items)}
+            settings = _convert_options(global_conf, local_conf)
+            
+            eq_(settings[setting_name], dict_items,
+                "%s must be a dict, but it is %r" % (setting_name,
+                                                     settings[setting_name]),
+                )
+    
+    def test_custom_dictionary(self):
+        """Custom dictionaries should be converted."""
+        items = ("foo = bar", "baz=abc", " xyz = mno ")
+        global_conf = {
+            'debug': "yes",
+            'twod.dictionaries': ("mydict", ),
+            }
+        local_conf = {'mydict': "\n    ".join(items)}
+        settings = _convert_options(global_conf, local_conf)
+        
+        eq_(settings['mydict'], {'foo': "bar", 'baz': "abc", 'xyz': "mno"})
+        # "twod.tuples" should have not been added:
+        assert_false("twod.dictionaries" in settings)
     
     def test_strings(self):
         """
