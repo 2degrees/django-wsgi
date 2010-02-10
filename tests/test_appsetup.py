@@ -235,7 +235,7 @@ class TestSettingsConvertion(object):
         items = ("foo", "bar", "baz")
         for setting_name in _DJANGO_TUPLES:
             global_conf = {'debug': "yes"}
-            local_conf = {setting_name: "\n    ".join(items)}
+            local_conf = {setting_name: "\n " + "\n    ".join(items)}
             settings = _convert_options(global_conf, local_conf)
             
             eq_(settings[setting_name], items,
@@ -250,7 +250,7 @@ class TestSettingsConvertion(object):
             'debug': "yes",
             'twod.tuples': ("mytuple", ),
             }
-        local_conf = {'mytuple': "\n    ".join(items)}
+        local_conf = {'mytuple': "\n " + "\n    ".join(items)}
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['mytuple'], items)
@@ -264,7 +264,7 @@ class TestSettingsConvertion(object):
         
         for setting_name in _DJANGO_NESTED_TUPLES:
             global_conf = {'debug': "yes"}
-            local_conf = {setting_name: "\n    ".join(items)}
+            local_conf = {setting_name: "\n " + "\n    ".join(items)}
             settings = _convert_options(global_conf, local_conf)
             
             eq_(settings[setting_name], nested_items)
@@ -277,7 +277,7 @@ class TestSettingsConvertion(object):
             'debug': "yes",
             'twod.nested_tuples': ("my_nested_tuple", ),
             }
-        local_conf = {'my_nested_tuple': "\n    ".join(items)}
+        local_conf = {'my_nested_tuple': "\n " + "\n    ".join(items)}
         
         settings = _convert_options(global_conf, local_conf)
         
@@ -292,7 +292,7 @@ class TestSettingsConvertion(object):
         
         for setting_name in _DJANGO_DICTIONARIES:
             global_conf = {'debug': "yes"}
-            local_conf = {setting_name: "\n    ".join(items)}
+            local_conf = {setting_name: "\n " + "\n    ".join(items)}
             settings = _convert_options(global_conf, local_conf)
             
             eq_(settings[setting_name], dict_items,
@@ -307,7 +307,7 @@ class TestSettingsConvertion(object):
             'debug': "yes",
             'twod.dictionaries': ("mydict", ),
             }
-        local_conf = {'mydict': "\n    ".join(items)}
+        local_conf = {'mydict': "\n " + "\n    ".join(items)}
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['mydict'], {'foo': "bar", 'baz': "abc", 'xyz': "mno"})

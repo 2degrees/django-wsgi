@@ -202,11 +202,11 @@ def _convert_options(global_conf, local_conf):
         elif option_name in nested_tuples:
             nested_tuple = tuple(
                 tuple((val.strip()) for val in tuple_.strip().split(";") if val)
-                for tuple_ in option_value.splitlines()
+                for tuple_ in option_value.strip().splitlines()
                 )
             options[option_name] = nested_tuple
         elif option_name in dictionaries:
-            lines = option_value.splitlines()
+            lines = option_value.strip().splitlines()
             items = [option.strip().split("=", 1) for option in lines]
             dictionary = dict(
                 (key.strip(), value.strip()) for (key, value) in items
