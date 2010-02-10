@@ -21,6 +21,7 @@ test and we don't have enough time to implement them.
 
 """
 from nose.plugins import Plugin
+from paste.deploy import loadapp
 
 __all__ = ("DjangoWsgifiedPlugin",)
 
@@ -59,8 +60,4 @@ class DjangoWsgifiedPlugin(Plugin):
         self.enabled = bool(self.paste_config_uri)
     
     def begin(self):
-        # We have to import here to avoid corrupting the coverage report for
-        # twod.wsgi itself:
-        from twod.wsgi.appsetup import load_django
-        
-        load_django(self.paste_config_uri)
+        loadapp(self.paste_config_uri)

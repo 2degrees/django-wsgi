@@ -26,7 +26,7 @@ from paste.deploy.converters import asbool, asint, aslist
 from twod.wsgi.handler import DjangoApplication
 
 
-__all__ = ("wsgify_django", "load_django")
+__all__ = ("wsgify_django", )
 
 _LOGGER = getLogger(__name__)
 
@@ -47,24 +47,6 @@ def wsgify_django(global_config, **local_conf):
     """
     _set_up_settings(global_config, local_conf)
     return DjangoApplication()
-
-
-def load_django(config_uri):
-    """
-    Load the PasteDeploy options into the Django settings module.
-    
-    :raises ImportError: If the Django settings module cannot be imported.
-    :raises ValueError: If an options attempts to set a Django setting which is
-        not supported.
-    :raises ValueError: If the ``django_settings_module`` directive is not set.
-    :raises ValueError: If Django's ``DEBUG`` is set instead of Paste's
-        ``debug``.
-    
-    """
-    all_options = appconfig(config_uri)
-    (global_config, local_conf) = _segregate_options(all_options)
-    
-    _set_up_settings(global_config, local_conf)
 
 
 def _set_up_settings(global_conf, local_conf):
@@ -104,37 +86,6 @@ def _set_up_settings(global_conf, local_conf):
             # The name is already used and it's not a list; let's warn the user:
             _LOGGER.warn('"%s" will not be overridden in %s', setting_name,
                          django_settings_module)
-
-
-#{ Reserved options handling
-
-
-_RESERVED_OPTIONS = frozenset([
-    "debug",
-    "django_settings_module",
-    "twod.booleans",
-    "twod.integers",
-    "twod.lists",
-    "twod.nested_lists",
-    ])
-
-
-def _segregate_options(options):
-    """
-    Extract the reserved options from ``options`` and returned separated from
-    the rest of the options.
-    
-    """
-    reserved_options = {}
-    free_options = {}
-    
-    for (option_name, option_value) in options.items():
-        if option_name in _RESERVED_OPTIONS:
-            reserved_options[option_name] = option_value
-        else:
-            free_options[option_name] = option_value
-    
-    return (reserved_options, free_options)
 
 
 #{ Type casting

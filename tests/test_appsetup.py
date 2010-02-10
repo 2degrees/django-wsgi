@@ -22,8 +22,8 @@ import os
 from nose.tools import eq_, ok_, assert_false, assert_raises
 from django.core.handlers.wsgi import WSGIHandler
 
-from twod.wsgi.appsetup import (wsgify_django, load_django, _segregate_options,
-    _set_up_settings, _convert_options, _DJANGO_BOOLEANS, _DJANGO_INTEGERS,
+from twod.wsgi.appsetup import (wsgify_django, _set_up_settings,
+    _convert_options, _DJANGO_BOOLEANS, _DJANGO_INTEGERS,
     _DJANGO_NESTED_TUPLES, _DJANGO_TUPLES, _DJANGO_DICTIONARIES,
     _DJANGO_UNSUPPORTED_SETTINGS)
 
@@ -53,22 +53,6 @@ class TestDjangoWsgifytor(BaseDjangoTestCase):
         from django.conf import settings
         assert_false(settings.DEBUG)
         eq_(settings.FOO, 10)
-
-
-class TestDjangoLoader(BaseDjangoTestCase):
-    """Tests for :func:`load_django`."""
-    
-    setup_fixture = False
-    
-    def test_it(self):
-        config = "config:" + os.path.join(_FIXTURES, "simplest-conf.ini")
-        load_django(config)
-        
-        from django.conf import settings
-        eq_(settings.BAR, "20")
-        ok_("DJANGO_SETTINGS_MODULE" in os.environ)
-        eq_(os.environ['DJANGO_SETTINGS_MODULE'],
-            "tests.fixtures.sampledjango.settings2")
 
 
 class TestSettingUpSettings(BaseDjangoTestCase):
@@ -383,64 +367,4 @@ class TestSettingsConvertion(object):
     def test_no_paste_debug(self):
         """Ensure the "debug" directive for Paste is set."""
         assert_raises(ValueError, _convert_options, {}, {})
-
-
-class TestOptionsSegregation(object):
-    """Tests for :func:`_segregate_options`."""
-    
-    def test_no_reserved_option(self):
-        """No reserved options will be extracted if there are none of them."""
-        options = {'foo': "bar"}
-        (reserved_options, free_options) = _segregate_options(options)
-        
-        eq_(len(reserved_options), 0)
-        eq_(len(free_options), 1)
-        eq_(free_options, options)
-    
-    def test_debug(self):
-        """'debug' is a reserved option and thus should be segregated."""
-        options = {'debug': "yes", 'foo': "bar"}
-        (reserved_options, free_options) = _segregate_options(options)
-        
-        eq_(len(reserved_options), 1)
-        eq_(reserved_options, {'debug': "yes"})
-        eq_(len(free_options), 1)
-        eq_(free_options, {'foo': "bar"})
-    
-    def test_django_settings(self):
-        """'django_settings_module' should be segregated."""
-        options = {'django_settings_module': "somewhere", 'foo': "bar"}
-        (reserved_options, free_options) = _segregate_options(options)
-        
-        eq_(len(reserved_options), 1)
-        eq_(reserved_options, {'django_settings_module': "somewhere"})
-        eq_(len(free_options), 1)
-        eq_(free_options, {'foo': "bar"})
-    
-    def test_twod_option_types(self):
-        """twod.* type casting options should be segregated."""
-        twod_options = {
-            'twod.booleans': ("mybool",),
-            'twod.integers': ("myint",),
-            'twod.lists': ("mylist",),
-            'twod.nested_lists': ("mynestlist",),
-            }
-        options = twod_options.copy()
-        options['foo'] = "bar"
-        
-        (reserved_options, free_options) = _segregate_options(options)
-        
-        eq_(len(reserved_options), 4)
-        eq_(reserved_options, twod_options)
-        eq_(len(free_options), 1)
-        eq_(free_options, {'foo': "bar"})
-    
-    def test_original_original_options(self):
-        """The original options dictionary must not be changed."""
-        options = {'django_settings_module': "somewhere", 'foo': "bar"}
-        _segregate_options(options)
-        
-        eq_(len(options), 2)
-        eq_(options['django_settings_module'], "somewhere")
-        eq_(options['foo'], "bar")
 
