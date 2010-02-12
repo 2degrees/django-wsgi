@@ -65,7 +65,7 @@ setup(name="twod.wsgi",
         "WebOb >= 0.9.7",
         "PasteDeploy >= 1.3.3",
         "setuptools",
-        "nose >= 0.11.1",
+        "nose",
         ],
       test_suite="nose.collector",
       entry_points = """\
