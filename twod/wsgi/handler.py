@@ -168,7 +168,7 @@ class _StartResponseWrapper(object):
             else:
                 final_headers.append((header_name, header_value))
         
-        return self.original_start_response(status, tuple(final_headers))
+        return self.original_start_response(status, final_headers)
 
 
 #}

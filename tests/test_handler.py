@@ -302,28 +302,29 @@ class TestStartResponse(object):
     def test_no_actual_phrase(self):
         """Nothing should be changed if there's no actual status reason."""
         status = "200 Sweet"
-        response_headers = (
+        response_headers = [
             ("X-Foo", "Whatever"),
             ("X-Bar", "Somehow"),
-            )
+            ]
         self.sr_wrapper(status, response_headers)
         ok_(self.original_sr.called)
         eq_(self.original_sr.status, status)
+        eq_(len(self.original_sr.response_headers), 2)
         eq_(self.original_sr.response_headers, response_headers)
         eq_(self.original_sr.exc_info, None)
     
     def test_with_actual_phrase(self):
         """The status reason must be replaced if it's set in the headers."""
         actual_status = "200 Cool"
-        response_headers = (
+        response_headers = [
             ("X-Foo", "Whatever"),
             ("X-Actual-Status-Reason", actual_status),
-            )
+            ]
         self.sr_wrapper("200 Sweet", response_headers)
         ok_(self.original_sr.called)
         eq_(self.original_sr.status, actual_status)
         eq_(len(self.original_sr.response_headers), 1)
-        eq_(self.original_sr.response_headers[0], ("X-Foo", "Whatever"))
+        eq_(self.original_sr.response_headers, [("X-Foo", "Whatever")])
         eq_(self.original_sr.exc_info, None)
 
 
