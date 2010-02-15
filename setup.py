@@ -51,6 +51,7 @@ setup(name="twod.wsgi",
       url="http://bitbucket.org/2degrees/twod.wsgi/",
       license="BSD (http://bitbucket.org/2degrees/twod.wsgi/src/tip/LICENSE)",
       packages=find_packages(exclude=["tests"]),
+      py_modules=["django_testing", "django_testing_recipe"],
       package_data={
         '': ["VERSION.txt", "README.txt"],
         'docs': ["Makefile", "source/*"]},
@@ -67,12 +68,18 @@ setup(name="twod.wsgi",
         "setuptools",
         "nose",
         ],
+      extras_require = {
+        'buildout': ["zc.recipe.egg >= 1.2.2"],
+        },
       test_suite="nose.collector",
       entry_points = """\
         [paste.app_factory]
         main = twod.wsgi.appsetup:wsgify_django
         
         [nose.plugins.0.10]
-        django-wsgified = django_wsgified:DjangoWsgifiedPlugin
+        django-wsgified = django_testing:DjangoWsgifiedPlugin
+        
+        [zc.buildout]
+        nose = django_testing_recipe:DjangoWsgifiedRecipe [buildout]
       """
       )

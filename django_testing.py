@@ -16,12 +16,13 @@
 """
 Nose plugin to run Django applications in a WSGI environment.
 
-This module has no automated tests on purpose, because it's very complex to
-test and we don't have enough time to implement them.
+This module has no automated tests on purpose. Functional tests would be very
+useful.
 
 """
 from nose.plugins import Plugin
 from paste.deploy import loadapp
+
 
 __all__ = ("DjangoWsgifiedPlugin",)
 
@@ -51,6 +52,16 @@ class DjangoWsgifiedPlugin(Plugin):
             dest=self.enableOpt,
             help=help,
             )
+        
+        parser.add_option(
+            "--no-db",
+            action="store_true",
+            default=False,
+            dest="no_db",
+            # We must mention "Django" so people know where the option comes
+            # from:
+            help="Do not set up a Django test database",
+            )
     
     def configure(self, options, conf):
         """Store the URI to the PasteDeploy configuration."""
@@ -58,6 +69,30 @@ class DjangoWsgifiedPlugin(Plugin):
         
         self.paste_config_uri = getattr(options, self.enableOpt)
         self.enabled = bool(self.paste_config_uri)
+        self.verbosity = options.verbosity
+        self.create_db = not options.no_db
     
     def begin(self):
         loadapp(self.paste_config_uri)
+        # It's safe to import from Django at this point. The infamous
+        # DJANGO_SETTINGS_MODULE is now set.
+        
+        # Setting up Django:
+        from django.test.utils import setup_test_environment
+        setup_test_environment()
+        
+        # Setting up the database:
+        if self.create_db:
+            from django.conf import settings
+            from django.db import connection
+            
+            self.db_name = settings.DATABASE_NAME
+            connection.creation.create_test_db(self.verbosity, autoclobber=True)
+    
+    def finalize(self, result=None):
+        from django.test.utils import teardown_test_environment
+        teardown_test_environment()
+        # Tearing down the database:
+        if self.create_db:
+            from django.db import connection
+            connection.creation.destroy_test_db(self.db_name, self.verbosity)
