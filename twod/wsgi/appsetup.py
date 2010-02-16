@@ -42,7 +42,7 @@ def wsgify_django(global_config, **local_conf):
     :raises ValueError: If Django's ``DEBUG`` is set instead of Paste's
         ``debug``.
     :return: The Django application as a WSGI application.
-    :rtype: :class:`~twod.wsgi.request.DjangoApplication`
+    :rtype: :class:`~twod.wsgi.handler.DjangoApplication`
     
     """
     _set_up_settings(global_config, local_conf)
