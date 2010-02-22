@@ -76,6 +76,9 @@ setup(name="twod.wsgi",
         [paste.app_factory]
         main = twod.wsgi.appsetup:wsgify_django
         
+        [paste.composite_factory]
+        full_django = twod.wsgi.factories:make_full_django_app
+        
         [nose.plugins.0.10]
         django-wsgified = django_testing:DjangoWsgifiedPlugin
         
