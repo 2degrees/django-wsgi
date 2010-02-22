@@ -5,7 +5,17 @@
 Table of contents
 =================
 
-
+.. toctree::
+   :maxdepth: 2
+   
+   paste-factory
+   request-objects
+   embedded-apps
+   media-apps
+   routing-args
+   responses
+   testing
+   buildout
 
 
 Introduction
@@ -34,7 +44,7 @@ components:
 - Functions to run WSGI applications inside Django reliably.
 - An :class:`~django.http.HttpRequest` class extended by the fully-featured
   :class:`webob.Request` (which is absolutely backwards compatible).
-- An :class:`~django.http.HttpResponse` class that supports custom HTTP status
+- An optional :class:`~django.http.HttpResponse` class that supports custom HTTP status
   reason phrases, as allowed by the HTTP and WSGI specifications (which is
   absolutely backwards compatible).
 - A Django middleware which implements the `wsgiorg.routing_args
@@ -47,6 +57,9 @@ these components bring Django to the same level as frameworks like TurboGears, a
 far as WSGI support is concerned.
 
 Hopefully after reading this manual you will realize how powerful WSGI can be!
+But keep in mind this manual simply describes the way third party software
+can be integrated in your application with *twod.wsgi*; you should still check
+the official documentation for that third party package.
 
 .. rubric:: Footnotes
 
