@@ -459,29 +459,74 @@ And then you'll be able to run the server::
     cd /path/to/your/project
     paster serve --reload config.ini
 
+:command:`paster` will load the application defined in ``app:main``. If you
+want to use a different one, you'd need to set it explicitly, e.g.::
 
+    paster serve --reload config.ini#develop
+
+If you don't want to type that long command all the time, you could just
+`execute that file directly <http://pythonpaste.org/script/#scripts>`_.
+
+
+Making :command:`manage` work again
+===================================
+
+You'll find that your :command:`manage` command will be broken after moving
+settings over to a PasteDeploy configuration file. The fix is really simple,
+just put the following at the top of your :command:`manage` script::
+
+    from paste.deploy import loadapp
+    
+    loadapp("config:/path/to/your/configuration.ini")
 
 
 Multiple configuration files
 ============================
 
+As we've seen so far, PasteDeploy configuration can be extended in a cascade
+like fashion. This can also be done across files.
 
+You could have the following base configuration file:
 
-Using custom factories
-======================
+.. code-block:: ini
 
+    # base-config.ini
+    
+    [DEFAULT]
+    debug = False
+    
+    [app:base]
+    use egg:twod.wsgi
+    EMAIL_PORT = 25
+    
+    [app:debug]
+    use = base
+    set debug = True
+
+And then override it for development:
+
+.. code-block:: ini
+
+    # develop.ini
+    
+    [server:main]
+    use = egg:Paste#http
+    port = 8080
+    
+    [app:main]
+    use = config:base-config.ini#debug
+    EMAIL_PORT = 1025
+
+This way, you could also run :command:`paster` as::
+
+    paster serve --reload develop.ini
 
 
 Setting up logging
 ==================
 
 
-Loading the settings outside of Paste
-=====================================
+Using custom factories
+======================
 
-    from paste.deploy import loadapp
-    
-    loadapp("config:/path/to/your/configuration.ini")
-    # or,
-    loadapp("config:/path/to/your/configuration.ini#development")
 
