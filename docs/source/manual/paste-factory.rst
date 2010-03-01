@@ -468,6 +468,68 @@ If you don't want to type that long command all the time, you could just
 `execute that file directly <http://pythonpaste.org/script/#scripts>`_.
 
 
+Configure logging
+~~~~~~~~~~~~~~~~~
+
+You can configure logging from the same PasteDeploy configuration file by
+adding all `the sections recognized by Python's built-in logging mechanisms
+<http://docs.python.org/library/logging.html#configuration-file-format>`_.
+
+A full development configuration file could look like this:
+
+.. code-block:: ini
+    
+    [server:main]
+    use = egg:Paste#http
+    port = 8000
+    
+    [app:main]
+    use = config:base-config.ini
+    set debug = True
+    
+    # ===== LOGGING
+    
+    [loggers]
+    keys = root,yourpackage
+    
+    [handlers]
+    keys = global,yourpackage
+    
+    [formatters]
+    keys = generic
+    
+    # Loggers
+    
+    [logger_root]
+    level = WARNING
+    handlers = global
+    
+    [logger_yourpackage]
+    qualname = coolproject.module
+    handlers = yourpackage
+    propagate = 0
+    
+    # Handlers
+    
+    [handler_global]
+    class = StreamHandler
+    args = (sys.stderr,)
+    level = NOTSET
+    formatter = generic
+    
+    [handler_yourpackage]
+    class = handlers.RotatingFileHandler
+    args = ("%(here)s/logs/coolpackage.log", )
+    level = NOTSET
+    formatter = generic
+    
+    # Formatters
+    
+    [formatter_generic]
+    format = %(asctime)s,%(msecs)03d %(levelname)-5.5s [%(name)s] %(message)s
+    datefmt = %Y-%m-%d %H:%M:%S
+
+
 Making :command:`manage` work again
 ===================================
 
@@ -520,10 +582,6 @@ And then override it for development:
 This way, you could also run :command:`paster` as::
 
     paster serve --reload develop.ini
-
-
-Setting up logging
-==================
 
 
 Using custom factories
