@@ -587,4 +587,57 @@ This way, you could also run :command:`paster` as::
 Using custom factories
 ======================
 
+If you need to perform a one-off routine when your application is started up
+(i.e., before any request), you can write your own PasteDeploy application
+factory::
+
+    from twod.wsgi import wsgify_django
+    
+    
+    def make_application(global_config, **local_conf):
+        
+        # Do something before importing Django and your settings have been applied.
+        
+        app = wsgify_django(global_config, **local_conf)
+        
+        # Do something right after your application has been set up (e.g., add WSGI middleware).
+        
+        return app
+
+``global_conf`` is a dictionary that contains all the options in the ``DEFAULT``
+section, while ``local_conf`` will contain all the options in the ``app:*``
+section.
+
+PasteDeploy offers two options to use application factories in a configuration
+file:
+
+- **Setuptools entry point**: If you add the following to your :file:`setup.py`
+  file::
+  
+      setup("yourdistribution",
+        # ...
+        entry_points="""
+        # -*- Entry points: -*-
+        [paste.app_factory]
+        main = yourpackage.module:make_application
+        """,
+      )
+   
+  you'd be able to use the factory as:
+  
+  .. code-block:: ini
+  
+      # ...
+      [app:main]
+      use = egg:yourdistribution
+      # ...
+   
+- If you can't or don't want to define an entry point, you can use it like this:
+
+  .. code-block:: ini
+  
+      # ...
+      [app:main]
+      paste.app_factory = yourpackage.module:make_application
+      # ...
 
