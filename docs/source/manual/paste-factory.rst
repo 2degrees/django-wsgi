@@ -496,7 +496,7 @@ You could have the following base configuration file:
     debug = False
     
     [app:base]
-    use egg:twod.wsgi
+    use = egg:twod.wsgi
     EMAIL_PORT = 25
     
     [app:debug]
