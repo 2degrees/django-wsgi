@@ -36,7 +36,7 @@ implementation.
 Finally, it's worth mentioning that:
 
 - This project is comprehensively tested and fully documented.
-- Most of the functionality has been in heavy use for over 2 months before the
+- Most of the functionality has been in heavy use for over 4 months before the
   initial alpha release, as `a patched version of Django
   <http://groups.google.com/group/django-developers/browse_thread/thread/08c7ffeee7b9343c>`_.
 - Our long-term goal is to see these improvements in Django itself -- Either with
