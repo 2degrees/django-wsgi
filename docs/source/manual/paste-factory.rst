@@ -310,7 +310,7 @@ and custom settings can be converted using the ``twod.nested_tuples``:
     # ...
     
     [app:main]
-    use egg:twod.wsgi
+    use = egg:twod.wsgi
     # ...
     ADMINS =
         Gustavo ; foo@example.com
