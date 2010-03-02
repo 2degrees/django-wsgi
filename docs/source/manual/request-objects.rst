@@ -48,7 +48,7 @@ name clashes with :class:`webob.Request`:
 :class:`webob.Request`'s ``.POST`` and ``.GET`` are available as ``.uPOST`` and
 ``.uGET``, respectively. The other attributes are equivalent in both classes.
 
-When you use this handler, your views receive the request as an instance of
+When you use this application, your views receive the request as an instance of
 :class:`~twod.wsgi.handler.TwodWSGIRequest` automatically.
 
 See the `API documentation for webob.Request
