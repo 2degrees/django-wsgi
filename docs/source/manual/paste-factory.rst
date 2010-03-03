@@ -439,10 +439,11 @@ development, for example, but we've fortunately left the PHP era behind.
 
 There are a few WSGI servers that are very convenient for development of WSGI
 application and `PasteScript <http://pythonpaste.org/script/>`_ is by far the
-most widely used one. Unlike Django's, it is multi-threaded and IE6 does not
-make it crash. Like Django's, it's able to reload the application when you
-change something in your code. It's also so robust that it's often the server
-of choice for people deploying with FastCGI.
+most widely used one. Unlike Django's, it is multi-threaded and thus `suitable
+for AJAX stuff <http://code.djangoproject.com/ticket/3357>`_. Like Django's,
+it's able to reload the application when you change something in your code.
+It's also so robust that it's often the server of choice for people deploying
+with FastCGI.
 
 Once you have installed PasteScript (e.g., :command:`easy_install PasteScript`),
 you need to configure the server in your configuration file by adding the
