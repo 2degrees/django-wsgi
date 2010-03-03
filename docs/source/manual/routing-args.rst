@@ -14,4 +14,4 @@ arguments ``hello-world`` and ``3`` will be available in the request object.
 Depending on how you defined your URL patterns, they'll be a dictionary (if you
 used named groups) or a tuple (if you didn't set names for the matching groups).
 The former are referred to as "named arguments" and the later as "positional
-arguments" in .
+arguments" in *routing_args* specification.
