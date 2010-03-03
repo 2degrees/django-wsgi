@@ -41,7 +41,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         expected_environ = original_environ.copy()
         # Running the app:
         app = MockApp("200 OK", [])
-        call_wsgi_app(app, request, "/admin")
+        call_wsgi_app(app, request, "/models")
         # Checking the environment after calling the WSGI application, but first
         # let's remove WebOb's ad-hoc attributes:
         del request.environ['webob.adhoc_attrs']
@@ -57,7 +57,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         request = _make_request(**environ)
         # Running the app:
         app = MockApp("200 OK", [])
-        call_wsgi_app(app, request, "/admin")
+        call_wsgi_app(app, request, "/models")
         ok_("wsgiorg.routing_args" not in app.environ)
     
     def test_webob_adhoc_attrs_are_removed(self):
@@ -71,7 +71,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         request = _make_request(**environ)
         # Running the app:
         app = MockApp("200 OK", [])
-        call_wsgi_app(app, request, "/admin")
+        call_wsgi_app(app, request, "/models")
         ok_("webob.adhoc_attrs" not in app.environ)
     
     def test_mount_point(self):
@@ -79,31 +79,36 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         request = _make_request(**environ)
         # Running the app:
         app = MockApp("200 OK", [])
-        call_wsgi_app(app, request, "/trac")
+        call_wsgi_app(app, request, "/wiki")
         eq_(app.environ['SCRIPT_NAME'], "/dev/trac")
         eq_(app.environ['PATH_INFO'], "/wiki")
     
     def test_incorrect_mount_point(self):
+        """
+        WSGI apps are not run when the path left to them is not the last
+        portion of the PATH_INFO in the original request.
+        
+        """
         environ = complete_environ(SCRIPT_NAME="/dev",
                                    PATH_INFO="/trac/wiki")
         request = _make_request(**environ)
-        mount_point = "/bugzilla"
+        path_info = "/trac"
         # Running the app:
         app = MockApp("200 OK", [])
         assert_raises(ApplicationCallError, call_wsgi_app, app, request,
-                      mount_point)
+                      path_info)
     
     def test_http_status(self):
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/trac/wiki")
         request = _make_request(**environ)
         # Running the app and make a valid request:
         app_ok = MockApp("200 Alright", [])
-        django_response_ok = call_wsgi_app(app_ok, request, "/trac")
+        django_response_ok = call_wsgi_app(app_ok, request, "/wiki")
         eq_(200, django_response_ok.status_code)
         eq_("Alright", django_response_ok.status_reason)
         # Running the app and make an invalid request:
         app_bad = MockApp("403 What are you trying to do?", [])
-        django_response_bad = call_wsgi_app(app_bad, request, "/trac")
+        django_response_bad = call_wsgi_app(app_bad, request, "/wiki")
         eq_(403, django_response_bad.status_code)
         eq_("What are you trying to do?", django_response_bad.status_reason)
     
@@ -122,7 +127,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
             }
         # Running the app:
         app = MockApp("200 OK", headers)
-        django_response = call_wsgi_app(app, request, "/trac")
+        django_response = call_wsgi_app(app, request, "/wiki")
         eq_(expected_headers, django_response._headers)
     
     def test_authenticated_user(self):
@@ -130,7 +135,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         request = _make_request(authenticated=True, **environ)
         # Running the app:
         app = MockApp("200 OK", [])
-        call_wsgi_app(app, request, "/trac")
+        call_wsgi_app(app, request, "/wiki")
         eq_("foobar", app.environ['REMOTE_USER'])
     
     def test_cookies_sent(self):
@@ -170,7 +175,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
             }
         # Running the app:
         app = MockApp("200 OK", headers)
-        django_response = call_wsgi_app(app, request, "/trac")
+        django_response = call_wsgi_app(app, request, "/wiki")
         # Checking the cookies:
         eq_(len(expected_cookies), len(django_response.cookies))
         # Finally, let's check each cookie:
@@ -190,7 +195,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         # Running a request:
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
         request = _make_request(**environ)
-        django_response = call_wsgi_app(app, request, "/blog")
+        django_response = call_wsgi_app(app, request, "/posts")
         # Checking the response:
         http_response = (
             "X-HEADER: Foo\n"
@@ -206,7 +211,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         # Running a request:
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
         request = _make_request(**environ)
-        django_response = call_wsgi_app(app, request, "/blog")
+        django_response = call_wsgi_app(app, request, "/posts")
         # Checking the response:
         assert_false(django_response._is_string)
         ok_(django_response.has_header("X-HEADER"))
@@ -224,7 +229,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         # Running a request:
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
         request = _make_request(**environ)
-        django_response = call_wsgi_app(app, request, "/blog")
+        django_response = call_wsgi_app(app, request, "/posts")
         # Checking the response:
         assert_false(django_response._is_string)
         ok_(django_response.has_header("X-HEADER"))
@@ -243,7 +248,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         # Running a request:
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
         request = _make_request(**environ)
-        django_response = call_wsgi_app(app, request, "/blog")
+        django_response = call_wsgi_app(app, request, "/posts")
         # Checking the .close() call:
         assert_false(app.app_iter.closed)
         django_response.close()

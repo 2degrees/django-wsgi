@@ -27,7 +27,7 @@ from twod.wsgi.exc import ApplicationCallError
 __all__ = ("call_wsgi_app", "make_wsgi_view")
 
 
-def call_wsgi_app(wsgi_app, request, mount_point):
+def call_wsgi_app(wsgi_app, request, path_info):
     """
     Call the ``wsgi_app`` with ``request`` and return its response.
     
@@ -35,8 +35,10 @@ def call_wsgi_app(wsgi_app, request, mount_point):
     :type wsgi_app: callable
     :param request: The Django request.
     :type request: :class:`django.http.HttpRequest`
-    :param mount_point: The path where the WSGI application should be mounted.
-    :type mount_point: :class:`basestring`
+    :param path_info: The ``PATH_INFO`` to be used by the WSGI application.
+    :type path: :class:`basestring`
+    :raises ApplicationCallError: If ``path_info`` is not the last portion of
+        the ``PATH_INFO`` in ``request``.
     :return: The response from the WSGI application, turned into a Django
         response.
     :rtype: :class:`django.http.HttpResponse`
@@ -46,11 +48,13 @@ def call_wsgi_app(wsgi_app, request, mount_point):
     
     # Moving the portion of the path consumed by the current view, from the
     # PATH_INTO to the SCRIPT_NAME:
-    if not new_request.path_info.startswith(mount_point):
-        raise ApplicationCallError("Path %s has not been consumed in PATH_INFO"
-                                   % mount_point)
-    new_request.path_info = new_request.path_info[len(mount_point):]
-    new_request.script_name = new_request.script_name + mount_point
+    if not request.path_info.endswith(path_info):
+        raise ApplicationCallError("Path %s is not the last portion of the "
+                                   "PATH_INFO in the original request (%s)"
+                                   % (path_info, request.path_info))
+    consumed_path = request.path_info[:-len(path_info)]
+    new_request.path_info = path_info
+    new_request.script_name = request.script_name + consumed_path
     
     # If the user has been authenticated in Django, log him in the WSGI app:
     if request.user.is_authenticated():
@@ -103,14 +107,8 @@ def make_wsgi_view(wsgi_app):
     
     """
     
-    def view(request, wsgi_path):
-        # Calculating the path consumed by this view:
-        if not request.path_info.endswith(wsgi_path):
-            raise ApplicationCallError(
-                "The WSGI application %r cannot be mounted at %s because this "
-                "is not where PATH_INFO ends" % (wsgi_app, wsgi_path))
-        consumed_path = request.path_info[:-len(wsgi_path)]
-        return call_wsgi_app(wsgi_app, request, mount_point=consumed_path)
+    def view(request, path_info):
+        return call_wsgi_app(wsgi_app, request, path_info)
     
     return view
 
