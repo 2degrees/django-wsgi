@@ -15,7 +15,6 @@ Table of contents
    routing-args
    responses
    testing
-   buildout
 
 
 Introduction
