@@ -55,6 +55,6 @@ Contents
    :maxdepth: 2
    
    manual/index
-   api/index
+   api
    about
    changelog

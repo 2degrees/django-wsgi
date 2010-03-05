@@ -34,14 +34,14 @@ def call_wsgi_app(wsgi_app, request, path_info):
     :param wsgi_app: The WSGI application to be run.
     :type wsgi_app: callable
     :param request: The Django request.
-    :type request: :class:`django.http.HttpRequest`
+    :type request: :class:`twod.wsgi.handler.TwodWSGIRequest`
     :param path_info: The ``PATH_INFO`` to be used by the WSGI application.
     :type path: :class:`basestring`
-    :raises ApplicationCallError: If ``path_info`` is not the last portion of
-        the ``PATH_INFO`` in ``request``.
+    :raises twod.wsgi.exc.ApplicationCallError: If ``path_info`` is not the
+        last portion of the ``PATH_INFO`` in ``request``.
     :return: The response from the WSGI application, turned into a Django
         response.
-    :rtype: :class:`django.http.HttpResponse`
+    :rtype: :class:`twod.wsgi.TwodResponse`
     
     """
     new_request = request.copy()
