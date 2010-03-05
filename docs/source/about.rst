@@ -108,10 +108,10 @@ set of Django views as an standalone WSGI application. We tried to join forces
 and contribute to that project instead of starting this one, but never got
 a response back.
 
-We also not sure if it's usable:
+We're also not sure if it's usable:
 
 - When you run a WSGI application, the path that has been consumed by the view
-  is not moved to the ``SCRIPT_PATH``. Every embedded application should
+  is not moved to the ``SCRIPT_NAME``. Every embedded application should
   misbehave.
 - Authentication information is not passed on to the embedded application
   (i.e., ``REMOTE_USER``).
