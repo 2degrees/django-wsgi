@@ -136,7 +136,7 @@ html_static_path = ['_static']
 # Custom sidebar templates, maps document names to template names.
 ohlog_sidebar = "ohloh-sidebar.html"
 sidebars = [ohlog_sidebar]
-html_sidebars = {'index': sidebars, 'manual/index': sidebars, 'api/index': sidebars,
+html_sidebars = {'index': sidebars, 'manual/index': sidebars, 'api': sidebars,
                  'about': sidebars, 'changelog': sidebars}
 
 # Additional templates that should be rendered to pages, maps page names to

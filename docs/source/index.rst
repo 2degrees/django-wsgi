@@ -47,6 +47,9 @@ Finally, it's worth mentioning that:
   work with Django 1.1-1.2 and Python 2.4-2.6 too -- Please let us know if it
   doesn't.
 
+Start reading the :doc:`manual/index` or :doc:`learn more about the project
+<about>`!
+
 
 Contents
 ========
