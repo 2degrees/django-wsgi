@@ -1,5 +1,5 @@
 =======================
-Serving media a la WSGI
+Serving media à la WSGI
 =======================
 
 Until now, the most common approach to serving static files (aka "media") in

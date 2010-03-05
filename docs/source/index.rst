@@ -5,8 +5,8 @@
 :Latest release: |release|
 
 
-**twod.wsgi** unlocks Django applications so developers can take advantage of
-the `wealth of existing WSGI software
+**twod.wsgi** unlocks Django applications so that developers can take advantage
+of the `wealth of existing WSGI software
 <http://pypi.python.org/pypi?%3Aaction=search&term=wsgi>`_, as the other
 popular Python frameworks do. It won't break you existing Django applications because
 it's 100% compatible with Django and you can start using the functionality
@@ -18,7 +18,7 @@ Among many other things, one of the components alone provides `solutions to
 some enterprise requirements for Django
 <http://groups.google.com/group/django-developers/browse_thread/thread/c89e028a536514d3>`_:
 
-- It's now possible to run code at startup time, in an straightforward yet
+- It's now possible to run code at startup time, in a straightforward yet
   extremely flexible fashion, which will also work on development servers if you
   want it to -- not only when deployed on a production server.
 - You can now stop using a Python module to store your application settings, in

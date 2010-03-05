@@ -115,7 +115,7 @@ We also not sure if it's usable:
   misbehave.
 - Authentication information is not passed on to the embedded application
   (i.e., ``REMOTE_USER``).
-- We don't see the point in running Django views as WSGI applications. No Django
+- We don't see the point in running Django views as WSGI applications and no Django
   middleware gets run, neither do routines set by Django's WSGI handler.
   [#standalone-django]_
 
@@ -136,7 +136,7 @@ Although these may be bugs, not the intended behaviour.
         [app:standalone_subset]
         use = existing_main_application
         ROOT_URLCONF = your_package.urls_subset
-
+        
   #. Use the "standalone_subset" version of your application::
   
       from paste.deploy import loadapp
