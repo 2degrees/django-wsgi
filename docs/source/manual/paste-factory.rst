@@ -543,11 +543,51 @@ just put the following at the top of your :command:`manage` script::
     loadapp("config:/path/to/your/configuration.ini")
 
 
+PasteDeploy and Buildout
+------------------------
+
+If you're using `Buildout <http://www.buildout.org/>`_, you may want to use
+the `zc.recipe.egg:scripts <http://pypi.python.org/pypi/zc.recipe.egg>`_
+recipe to preppend the initialisation code to your scripts. It'd be a powerful
+tool when your application may be run in different modes.
+
+For example, we're using it like this:
+
+.. code-block:: ini
+
+    [buildout]
+    parts = scripts
+    
+    # ...
+    
+    [scripts]
+    recipe = zc.recipe.egg:scripts
+    eggs =
+        ipython
+        OUR_DISTRIBUTION
+        sphinx
+    initialization = from paste.deploy import loadapp; loadapp("${vars:config_uri}")
+    # "manage" is defined in OUR_DISTRIBUTION
+    scripts = 
+        ipython
+        manage
+        sphinx-build
+    
+    [vars]
+    config_uri = config:${buildout:directory}/config.ini
+    
+    # ...
+
+.. tip::
+    If you want to share settings between your PasteDeploy and Buildout
+    configuration files, check `DeployRecipes
+    <http://packages.python.org/deployrecipes/>`_.
+
 Multiple configuration files
 ============================
 
-As we've seen so far, PasteDeploy configuration can be extended in a cascade
-like fashion. This can also be done across files.
+As we've seen so far, PasteDeploy configuration files can be extended in a
+cascade like fashion. This can also be done across files.
 
 You could have the following base configuration file:
 
