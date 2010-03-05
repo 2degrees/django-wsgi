@@ -30,7 +30,7 @@ setup(name="twod.wsgi",
       description="Enhanced WSGI support for Django applications",
       long_description=README,
       classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
         "Framework :: Django",
         "Framework :: Paste",
