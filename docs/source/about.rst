@@ -115,9 +115,9 @@ We're also not sure if it's usable:
   misbehave.
 - Authentication information is not passed on to the embedded application
   (i.e., ``REMOTE_USER``).
-- We don't see the point in running Django views as WSGI applications and no Django
-  middleware gets run, neither do routines set by Django's WSGI handler.
-  [#standalone-django]_
+- We don't see the point in running Django views as WSGI applications. It's
+  also inconvenient because no Django middleware gets run, neither do routines
+  set by Django's WSGI handler. [#standalone-django]_
 
 Although these may be bugs, not the intended behaviour.
 
