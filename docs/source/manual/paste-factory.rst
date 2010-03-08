@@ -310,7 +310,7 @@ and custom settings can be converted using the ``twod.nested_tuples``:
     # ...
     
     [app:main]
-    use egg:twod.wsgi
+    use = egg:twod.wsgi
     # ...
     ADMINS =
         Gustavo ; foo@example.com
@@ -439,10 +439,11 @@ development, for example, but we've fortunately left the PHP era behind.
 
 There are a few WSGI servers that are very convenient for development of WSGI
 application and `PasteScript <http://pythonpaste.org/script/>`_ is by far the
-most widely used one. Unlike Django's, it is multi-threaded and IE6 does not
-make it crash. Like Django's, it's able to reload the application when you
-change something in your code. It's also so robust that it's often the server
-of choice for people deploying with FastCGI.
+most widely used one. Unlike Django's, it is multi-threaded and thus `suitable
+for AJAX stuff <http://code.djangoproject.com/ticket/3357>`_. Like Django's,
+it's able to reload the application when you change something in your code.
+It's also so robust that it's often the server of choice for people deploying
+with FastCGI.
 
 Once you have installed PasteScript (e.g., :command:`easy_install PasteScript`),
 you need to configure the server in your configuration file by adding the
@@ -468,6 +469,68 @@ If you don't want to type that long command all the time, you could just
 `execute that file directly <http://pythonpaste.org/script/#scripts>`_.
 
 
+Configure logging
+~~~~~~~~~~~~~~~~~
+
+You can configure logging from the same PasteDeploy configuration file by
+adding all `the sections recognized by Python's built-in logging mechanisms
+<http://docs.python.org/library/logging.html#configuration-file-format>`_.
+
+A full development configuration file could look like this:
+
+.. code-block:: ini
+    
+    [server:main]
+    use = egg:Paste#http
+    port = 8000
+    
+    [app:main]
+    use = config:base-config.ini
+    set debug = True
+    
+    # ===== LOGGING
+    
+    [loggers]
+    keys = root,yourpackage
+    
+    [handlers]
+    keys = global,yourpackage
+    
+    [formatters]
+    keys = generic
+    
+    # Loggers
+    
+    [logger_root]
+    level = WARNING
+    handlers = global
+    
+    [logger_yourpackage]
+    qualname = coolproject.module
+    handlers = yourpackage
+    propagate = 0
+    
+    # Handlers
+    
+    [handler_global]
+    class = StreamHandler
+    args = (sys.stderr,)
+    level = NOTSET
+    formatter = generic
+    
+    [handler_yourpackage]
+    class = handlers.RotatingFileHandler
+    args = ("%(here)s/logs/coolpackage.log", )
+    level = NOTSET
+    formatter = generic
+    
+    # Formatters
+    
+    [formatter_generic]
+    format = %(asctime)s,%(msecs)03d %(levelname)-5.5s [%(name)s] %(message)s
+    datefmt = %Y-%m-%d %H:%M:%S
+
+
 Making :command:`manage` work again
 ===================================
 
@@ -480,11 +543,51 @@ just put the following at the top of your :command:`manage` script::
     loadapp("config:/path/to/your/configuration.ini")
 
 
+PasteDeploy and Buildout
+------------------------
+
+If you're using `Buildout <http://www.buildout.org/>`_, you may want to use
+the `zc.recipe.egg:scripts <http://pypi.python.org/pypi/zc.recipe.egg>`_
+recipe to preppend the initialisation code to your scripts. It'd be a powerful
+tool when your application may be run in different modes.
+
+For example, we're using it like this:
+
+.. code-block:: ini
+
+    [buildout]
+    parts = scripts
+    
+    # ...
+    
+    [scripts]
+    recipe = zc.recipe.egg:scripts
+    eggs =
+        ipython
+        OUR_DISTRIBUTION
+        sphinx
+    initialization = from paste.deploy import loadapp; loadapp("${vars:config_uri}")
+    # "manage" is defined in OUR_DISTRIBUTION
+    scripts = 
+        ipython
+        manage
+        sphinx-build
+    
+    [vars]
+    config_uri = config:${buildout:directory}/config.ini
+    
+    # ...
+
+.. tip::
+    If you want to share settings between your PasteDeploy and Buildout
+    configuration files, check `DeployRecipes
+    <http://packages.python.org/deployrecipes/>`_.
+
 Multiple configuration files
 ============================
 
-As we've seen so far, PasteDeploy configuration can be extended in a cascade
-like fashion. This can also be done across files.
+As we've seen so far, PasteDeploy configuration files can be extended in a
+cascade like fashion. This can also be done across files.
 
 You could have the following base configuration file:
 
@@ -496,7 +599,7 @@ You could have the following base configuration file:
     debug = False
     
     [app:base]
-    use egg:twod.wsgi
+    use = egg:twod.wsgi
     EMAIL_PORT = 25
     
     [app:debug]
@@ -522,11 +625,60 @@ This way, you could also run :command:`paster` as::
     paster serve --reload develop.ini
 
 
-Setting up logging
-==================
-
-
 Using custom factories
 ======================
 
+If you need to perform a one-off routine when your application is started up
+(i.e., before any request), you can write your own PasteDeploy application
+factory::
+
+    from twod.wsgi import wsgify_django
+    
+    
+    def make_application(global_config, **local_conf):
+        
+        # Do something before importing Django and your settings have been applied.
+        
+        app = wsgify_django(global_config, **local_conf)
+        
+        # Do something right after your application has been set up (e.g., add WSGI middleware).
+        
+        return app
+
+``global_conf`` is a dictionary that contains all the options in the ``DEFAULT``
+section, while ``local_conf`` will contain all the options in the ``app:*``
+section.
+
+PasteDeploy offers two options to use application factories in a configuration
+file:
+
+- **Setuptools entry point**: If you add the following to your :file:`setup.py`
+  file::
+  
+      setup("yourdistribution",
+        # ...
+        entry_points="""
+        # -*- Entry points: -*-
+        [paste.app_factory]
+        main = yourpackage.module:make_application
+        """,
+      )
+   
+  you'd be able to use the factory as:
+  
+  .. code-block:: ini
+  
+      # ...
+      [app:main]
+      use = egg:yourdistribution
+      # ...
+   
+- If you can't or don't want to define an entry point, you can use it like this:
+
+  .. code-block:: ini
+  
+      # ...
+      [app:main]
+      paste.app_factory = yourpackage.module:make_application
+      # ...
 
