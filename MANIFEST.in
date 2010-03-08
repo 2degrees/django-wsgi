@@ -1,9 +1,7 @@
-include LICENSE
+include LICENSE.txt
 include README.txt
 include VERSION.txt
 include MANIFEST.in
 
 recursive-exclude tests/ *
 recursive-exclude docs/ *
-
-global-exclude *~ *.pyc
