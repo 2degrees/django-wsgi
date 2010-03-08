@@ -50,7 +50,8 @@ Finally, it's worth mentioning that:
 You may want to start by checking `our presentation at the Django User Group in London
 <http://gustavonarea.net/files/talks/twodwsgi-djugl.pdf>`_ (for a high-level
 introduction), read the :doc:`manual/index` or :doc:`learn more about the project
-<about>`!
+<about>`! You can also download a `demo application
+<http://bitbucket.org/Gustavo/weesgo/>`_.
 
 
 Contents
