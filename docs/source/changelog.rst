@@ -2,6 +2,13 @@
 Releases
 ========
 
+Version 1.0 Alpha 3 (2010-03-11)
+================================
+
+Fixed another packaging problem: :file:`ez_setup.py` was not included in the
+final distribution. This time it was certainly our fault.
+
+
 Version 1.0 Alpha 2 (2010-03-08)
 ================================
 
