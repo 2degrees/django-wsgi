@@ -2,6 +2,14 @@
 Releases
 ========
 
+Version 1.0 Alpha 4 (unreleased)
+================================
+
+* Added :func:`twod.wsgi.factories.add_media_to_app`, which receives a Django
+  powered WSGI application and returns a WSGI application which serves the
+  entire Web site (including the media).
+
+
 Version 1.0 Alpha 3 (2010-03-11)
 ================================
 

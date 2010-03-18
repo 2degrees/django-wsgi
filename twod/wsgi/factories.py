@@ -24,17 +24,32 @@ from paste.urlparser import StaticURLParser
 from django import __file__ as django_init
 
 
+__all__ = ("make_full_django_app", "add_media_to_app")
+
+
 _DJANGO_ROOT = path.dirname(django_init)
 
 
-def make_full_django_app(loader, global_conf, **local_conf):#pragma: nocover
+def make_full_django_app(loader, global_conf, **local_conf):
     """
-    Return a WSGI application made up of the ``django_app``, its media and the
-    Django Admin media.
+    Return a WSGI application made up of the Django application, its media and
+    the Django Admin media.
+    
+    This is a PasteDeploy Composite Application Factory.
+    
+    """
+    django_app = loader.get_app(local_conf['django_app'], global_conf=global_conf)
+    return add_media_to_app(django_app)
+
+
+def add_media_to_app(django_app):
+    """
+    Return a WSGI application made up of the Django application, its media and
+    the Django Admin media.
     
     """
     app = URLMap()
-    app['/'] = loader.get_app(local_conf['django_app'], global_conf=global_conf)
+    app['/'] = django_app
     
     # The Django App has been loaded, so it's now safe to access the settings:
     from django.conf import settings
@@ -47,3 +62,5 @@ def make_full_django_app(loader, global_conf, **local_conf):#pragma: nocover
     app[settings.MEDIA_URL] = StaticURLParser(settings.MEDIA_ROOT)
     
     return app
+    
+
