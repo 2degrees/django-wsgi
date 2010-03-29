@@ -2,7 +2,7 @@
 Releases
 ========
 
-Version 1.0 Alpha 4 (unreleased)
+Version 1.0 Alpha 4 (2010-03-29)
 ================================
 
 * Added :func:`twod.wsgi.factories.add_media_to_app`, which receives a Django
