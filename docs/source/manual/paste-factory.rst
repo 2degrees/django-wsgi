@@ -32,10 +32,10 @@ provided by *twod.wsgi*.
 
     [DEFAULT]
     debug = False
+    django_settings_module = your_application.settings
     
     [app:main]
     use = egg:twod.wsgi
-    django_settings_module = your_application.settings
 
 It does not define any option that can be used by Django or your application,
 apart from ``debug``. Note this option is lower case: That's the de-facto
@@ -57,10 +57,10 @@ deployment mode, you could use a configuration like this:
 
     [DEFAULT]
     debug = False
+    django_settings_module = your_application.settings
     
     [app:main]
     use = egg:twod.wsgi
-    django_settings_module = your_application.settings
     
     [app:development]
     use = main
@@ -74,10 +74,10 @@ which depend on this value, you can still refer to it like this:
 
     [DEFAULT]
     debug = False
+    django_settings_module = your_application.settings
     
     [app:main]
     use = egg:twod.wsgi
-    django_settings_module = your_application.settings
     TEMPLATE_DEBUG = %(debug)s
     
     [app:development]
@@ -90,10 +90,10 @@ Or, you can override them on a per application basis:
 
     [DEFAULT]
     debug = False
+    django_settings_module = your_application.settings
     
     [app:main]
     use = egg:twod.wsgi
-    django_settings_module = your_application.settings
     TEMPLATE_DEBUG = False
     
     [app:development]
@@ -382,7 +382,6 @@ this:
     
     [app:main]
     use = egg:twod.wsgi
-    django_settings_module = your_application.settings
     MEDIA_ROOT = %(here)s/media
     
     # ...
