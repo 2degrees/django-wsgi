@@ -19,6 +19,12 @@ Embedded applications
 .. autofunction:: call_wsgi_app
 
 
+Media serving
+=============
+
+.. autofunction:: twod.wsgi.factories.add_media_to_app
+
+
 Exceptions
 ==========
 

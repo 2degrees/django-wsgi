@@ -8,6 +8,11 @@ Version 1.0 Alpha 4 (unreleased)
 * Added :func:`twod.wsgi.factories.add_media_to_app`, which receives a Django
   powered WSGI application and returns a WSGI application which serves the
   entire Web site (including the media).
+* Fixed typos in the documentation: The ``django_settings_module`` option in
+  :doc:`manual/paste-factory` was being put in the ``[DEFAULT]`` section;
+  the right location is an application section.
+* Paste itself was not a requirement in :file:`setup.py`, people who didn't
+  have it installed already would get :class:`ImportError` exceptions.
 
 
 Version 1.0 Alpha 3 (2010-03-11)

@@ -53,3 +53,31 @@ You'll then need to make sure you load ``full_app`` instead of ``myapp``, since
 the later is presumably no longer able to serve media. To that end, you may
 consider renaming ``composite:full_app`` to ``composite:main``.
 
+
+Setting up the media programatically
+====================================
+
+If for some reason you need to set this up from your Python code, you can use
+the :func:`twod.wsgi.factories.add_media_to_app` function::
+
+    from paste.deploy import loadapp
+    from twod.wsgi.factories import add_media_to_app
+    
+    # The Django-powered application, with no media:
+    django_app = loadapp("config:/path/to/config.ini")
+    
+    # The Django-powered application plus the media:
+    full_app = add_media_to_app(django_app)
+
+
+This would be particularly useful if you'd like to serve static files from more
+than one directory::
+
+    from paste.urlparser import StaticURLParser
+    
+    full_app['/css'] = StaticURLParser("/path/to/the/css/directory")
+    full_app['/js'] = StaticURLParser("/path/to/the/js/directory")
+
+Of course, this would be something you'd do on your development servers. In
+production environments it's always best to leave the server serve the static
+files.
