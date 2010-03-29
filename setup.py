@@ -64,6 +64,7 @@ setup(name="twod.wsgi",
       install_requires=[
         "Django >= 1.1",
         "WebOb >= 0.9.7",
+        "Paste >= 1.7.2",
         "PasteDeploy >= 1.3.3",
         "setuptools",
         "nose",
