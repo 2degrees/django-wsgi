@@ -52,11 +52,6 @@ setup(name="twod.wsgi",
       license="BSD (http://dev.2degreesnetwork.com/p/2degrees-license.html)",
       packages=find_packages(exclude=["tests"]),
       py_modules=["django_testing", "django_testing_recipe"],
-      #package_data={
-      #  '': ["VERSION.txt", "README.txt"],
-      #  'docs': ["Makefile", "source/*"]},
-      #exclude_package_data={"": ["docs"]},
-      #include_package_data=True,
       zip_safe=False,
       tests_require = [
         "coverage",
