@@ -2,6 +2,15 @@
 Releases
 ========
 
+Version 1.0 RC 1 (2010-04-26)
+=============================
+
+The fourth alpha proved to very stable as no bugs were found, so it's being
+released as is, as a Release Candidate with one minor modification: 
+
+* Corrected URL to 2degrees license in the docstrings.
+
+
 Version 1.0 Alpha 4 (2010-03-29)
 ================================
 
