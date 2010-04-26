@@ -6,7 +6,7 @@
 #
 # This file is part of twod.wsgi <http://bitbucket.org/2degrees/twod.wsgi/>,
 # which is subject to the provisions of the BSD at
-# <http://bitbucket.org/2degrees/twod.wsgi/src/tip/LICENSE>. A copy of the
+# <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
 # AND ANY AND ALL EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED, INCLUDING, BUT
 # NOT LIMITED TO, THE IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST
@@ -49,7 +49,7 @@ setup(name="twod.wsgi",
       author_email="gustavonarea@2degreesnetwork.com",
       namespace_packages=["twod"],
       url="http://packages.python.org/twod.wsgi/",
-      license="BSD (http://bitbucket.org/2degrees/twod.wsgi/src/tip/LICENSE)",
+      license="BSD (http://dev.2degreesnetwork.com/p/2degrees-license.html)",
       packages=find_packages(exclude=["tests"]),
       py_modules=["django_testing", "django_testing_recipe"],
       #package_data={
