@@ -35,8 +35,8 @@ for Buildout is `Python's Distutils-SIG
 queries about WSGI in general.
 
 For questions directly related to *twod.wsgi* or if you're not sure what's
-the right place to ask a given question, please use our `2degrees-dev mailing
-list <http://groups.google.com/group/2degrees-dev/>`_.
+the right place to ask a given question, please use our `2degrees-floss mailing
+list <http://groups.google.com/group/2degrees-floss/>`_.
 
 
 Supporting twod.wsgi
