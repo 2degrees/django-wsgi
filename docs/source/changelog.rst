@@ -2,6 +2,13 @@
 Releases
 ========
 
+Version 1.0 RC 2 (unreleased)
+=============================
+
+* Updated the URL to the (new) `mailing list
+  <http://groups.google.com/group/2degrees-floss>`_.
+
+
 Version 1.0 RC 1 (2010-04-26)
 =============================
 
