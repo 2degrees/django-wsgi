@@ -7,6 +7,7 @@ Version 1.0 RC 2 (unreleased)
 
 * Updated the URL to the (new) `mailing list
   <http://groups.google.com/group/2degrees-floss>`_.
+* Removed not applicable trove classifier for the Python Package Index.
 
 
 Version 1.0 RC 1 (2010-04-26)

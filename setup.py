@@ -42,7 +42,6 @@ setup(name="twod.wsgi",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI",
         "Topic :: Security",
-        "Topic :: Software Development :: Libraries :: Application Frameworks"
         ],
       keywords="django wsgi paste web",
       author="2degrees Limited",
