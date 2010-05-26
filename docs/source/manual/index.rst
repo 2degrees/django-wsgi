@@ -20,10 +20,10 @@ Table of contents
 Introduction
 ============
 
-To date, WSGI support in Django has been a long-standing problem that does not
-only affect the Django community: The wider Python Web development community
-could be benefiting from reusable components written by Django users, who
-represent an important portion of said community.
+To date, Django users have not been able to use the full potential of WSGI
+in their applications and that also affects the wider Python Web development
+community, which could be benefiting from reusable components written by Django
+users, who represent an important portion of said community.
 
 In the beginning there was no support at all and nowadays compliance is nearly
 complete at the bare minimum level. This has been pointed out many times, by known
