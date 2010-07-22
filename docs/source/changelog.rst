@@ -5,9 +5,14 @@ Releases
 Version 1.0 Final (2010-07-22)
 ==============================
 
+The code is the same as in the release candidate, but the documentation and
+the distribution metadata changed as follows:
+
 * Updated the URL to the (new) `mailing list
   <http://groups.google.com/group/2degrees-floss>`_.
 * Removed not applicable trove classifier for the Python Package Index.
+* Mentioned that settings introduced in Django 1.2 are not yet supported by
+  the Paste Deploy application factory.
 
 
 Version 1.0 RC 1 (2010-04-26)

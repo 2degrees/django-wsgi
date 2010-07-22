@@ -364,6 +364,8 @@ The following options are not converted automatically, yet:
 - ``MESSAGE_TAGS``.
 - ``SERIALIZATION_MODULES``.
 
+New settings introduced in Django 1.2 are not supported yet either.
+
 So, if you need to use them, you would need to define them in your settings
 module or create your own factory (see below) to convert the values by
 yourself.
