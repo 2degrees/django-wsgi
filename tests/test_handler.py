@@ -129,7 +129,6 @@ class TestRequest(BaseDjangoTestCase):
         """
         body = StringIO(urlencode({'foo': "bar", 'bar': "foo"}))
         
-        # HEAD requests:
         head_request = TwodWSGIRequest({
             'REQUEST_METHOD': "HEAD",
             'PATH_INFO': "/",
