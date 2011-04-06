@@ -118,6 +118,56 @@ class TestRequest(BaseDjangoTestCase):
         twod_request.uPOST
         ok_("CONTENT_LENGTH" in twod_request.environ)
     
+    def test_body_seeking(self):
+        """
+        A seek to zero is performed on the "wsgi.input" in POST and PUT requests
+        only.
+        
+        HEAD and GET requests don't have body, but the "wsgi.input" object may
+        have been set -- In such situation, no seek must be performed.
+        
+        """
+        body = StringIO(urlencode({'foo': "bar", 'bar': "foo"}))
+        
+        # HEAD requests:
+        head_request = TwodWSGIRequest({
+            'REQUEST_METHOD': "HEAD",
+            'PATH_INFO': "/",
+            'wsgi.input': body,
+            })
+        
+        get_request = TwodWSGIRequest({
+            'REQUEST_METHOD': "GET",
+            'PATH_INFO': "/",
+            'wsgi.input': body,
+            })
+        
+        post_request = TwodWSGIRequest({
+            'REQUEST_METHOD': "POST",
+            'PATH_INFO': "/",
+            'CONTENT_TYPE': "application/x-www-form-urlencoded",
+            'wsgi.input': body,
+            })
+        
+        put_request = TwodWSGIRequest({
+            'REQUEST_METHOD': "PUT",
+            'PATH_INFO': "/",
+            'CONTENT_TYPE': "application/x-www-form-urlencoded",
+            'wsgi.input': body,
+            })
+        
+        # Requests where seeks must NOT be performed:
+        for request in (head_request, get_request):
+            body.seek(3)
+            request._seek_input()
+            eq_(body.tell(), 3, "%s requests have no body" % request.method)
+        
+        # Requests where seeks MUST be performed:
+        for request in (post_request, put_request):
+            body.seek(3)
+            request._seek_input()
+            eq_(body.tell(), 0, "%s requests have body" % request.method)
+    
     def _make_requests(self, environ):
         
         base_environ = {

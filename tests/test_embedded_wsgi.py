@@ -37,8 +37,8 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         """The original environ must have not been modified."""
         original_environ = complete_environ(SCRIPT_NAME="/blog",
                                             PATH_INFO="/admin/models")
-        request = _make_request(**original_environ)
         expected_environ = original_environ.copy()
+        request = _make_request(**original_environ)
         # Running the app:
         app = MockApp("200 OK", [])
         call_wsgi_app(app, request, "/models")
