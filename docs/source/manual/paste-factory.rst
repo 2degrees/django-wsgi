@@ -646,7 +646,7 @@ factory::
         
         return app
 
-``global_conf`` is a dictionary that contains all the options in the ``DEFAULT``
+``global_config`` is a dictionary that contains all the options in the ``DEFAULT``
 section, while ``local_conf`` will contain all the options in the ``app:*``
 section.
 
