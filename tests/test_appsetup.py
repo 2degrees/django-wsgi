@@ -25,7 +25,7 @@ from django.core.handlers.wsgi import WSGIHandler
 from twod.wsgi.appsetup import (wsgify_django, _set_up_settings,
     _convert_options, _DJANGO_BOOLEANS, _DJANGO_INTEGERS,
     _DJANGO_NESTED_TUPLES, _DJANGO_TUPLES, _DJANGO_DICTIONARIES,
-    _DJANGO_UNSUPPORTED_SETTINGS)
+    _DJANGO_NONE_IF_EMPTY_SETTINGS, _DJANGO_UNSUPPORTED_SETTINGS)
 
 from tests import BaseDjangoTestCase
 
@@ -140,6 +140,8 @@ class TestSettingUpSettings(BaseDjangoTestCase):
         
         eq_(os.environ['DJANGO_SETTINGS_MODULE'], "tests.fixtures.list_module")
         eq_(list_module.DA_LIST, (1, 2, 3, 8, 9))
+        
+        
     
     def test_non_django_settings_module(self):
         """
@@ -311,8 +313,49 @@ class TestSettingsConvertion(object):
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['mydict'], {'foo': "bar", 'baz': "abc", 'xyz': "mno"})
-        # "twod.tuples" should have not been added:
+        # "twod.dictionaries" should have not been added:
         assert_false("twod.dictionaries" in settings)
+        
+    def test_official_none_if_empty_settings(self):
+        """Django's settings which are None if unspecified must be converted."""
+        
+        for setting_name in _DJANGO_NONE_IF_EMPTY_SETTINGS:
+            global_conf = {'debug': "yes"}
+            local_conf = {setting_name: ""}
+            settings = _convert_options(global_conf, local_conf)
+            
+            ok_(settings[setting_name] is None,
+                "%s must be NoneType, but it is %r" % (setting_name,
+                                                       settings[setting_name]),
+                )
+    
+    def test_custom_none_if_empty_settings(self):
+        """Custom NoneTypes should be converted."""
+
+        global_conf = {
+            'debug': "yes",
+            'twod.none_if_empty_settings': ("mynone", ),
+            }
+        local_conf = {'mynone': ""}
+        settings = _convert_options(global_conf, local_conf)
+        
+        ok_(settings['mynone'] is None)
+        # "twod.none_settings" should have not been added:
+        assert_false("twod.none_if_empty_settings" in settings)
+        
+    def test_non_if_empty_non_empty_settings(self):
+        """Non-empty 'none if empty' settings are left as strings."""
+        
+        global_conf = {
+            'debug': "yes",
+            'twod.none_if_empty_settings': ("mynone", ),
+            }
+        local_conf = {'mynone': 'I am a string'}
+        settings = _convert_options(global_conf, local_conf)
+        
+        eq_(settings['mynone'], 'I am a string')
+        # "twod.none_settings" should have not been added:
+        assert_false("twod.none_if_empty_settings" in settings)
     
     def test_strings(self):
         """
