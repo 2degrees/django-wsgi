@@ -2,12 +2,13 @@
 Releases
 ========
 
-Version 1.1 Alpha 1 (2011-06-29)
-================================
+Version 1.0.1 (2011-06-29)
+==========================
 
-Version 1.1 adds support for configuration variables which can either be 
+Version 1.0.1 adds support for configuration variables which can either be 
 ``None`` if left empty or strings otherwise. This functionality is useful when
 overriding settings in inherited blocks.
+
 
 Version 1.0 Final (2010-07-22)
 ==============================
