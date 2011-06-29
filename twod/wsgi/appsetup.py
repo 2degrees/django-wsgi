@@ -227,8 +227,9 @@ def _convert_options(global_conf, local_conf):
                 )
             options[option_name] = dictionary
         elif option_name in none_if_empty_settings:
-            if option_value:
-                value_to_use = option_value
+            value = option_value.strip()
+            if value:
+                value_to_use = value
             else:
                 value_to_use = None
             options[option_name] = value_to_use

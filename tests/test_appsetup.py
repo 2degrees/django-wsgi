@@ -203,7 +203,6 @@ class TestSettingsConvertion(object):
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['mybool'], False)
-        # "twod.booleans" should have not been added:
         assert_false("twod.booleans" in settings)
     
     def test_official_integers(self):
@@ -229,7 +228,6 @@ class TestSettingsConvertion(object):
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['myint'], 3)
-        # "twod.integers" should have not been added:
         assert_false("twod.integers" in settings)
     
     def test_official_tuples(self):
@@ -256,7 +254,6 @@ class TestSettingsConvertion(object):
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['mytuple'], items)
-        # "twod.tuples" should have not been added:
         assert_false("twod.tuples" in settings)
     
     def test_official_nested_tuples(self):
@@ -284,7 +281,6 @@ class TestSettingsConvertion(object):
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['my_nested_tuple'], nested_items)
-        # "twod.nested_tuples" should have not been added:
         assert_false("twod.nested_tuples" in settings)
     
     def test_official_dictionaries(self):
@@ -313,7 +309,6 @@ class TestSettingsConvertion(object):
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['mydict'], {'foo': "bar", 'baz': "abc", 'xyz': "mno"})
-        # "twod.dictionaries" should have not been added:
         assert_false("twod.dictionaries" in settings)
         
     def test_official_none_if_empty_settings(self):
@@ -334,13 +329,13 @@ class TestSettingsConvertion(object):
 
         global_conf = {
             'debug': "yes",
-            'twod.none_if_empty_settings': ("mynone", ),
+            'twod.none_if_empty_settings': ("mynone", "mynonewithspace"),
             }
-        local_conf = {'mynone': ""}
+        local_conf = {'mynone': '', 'mynonewithspace': '    '}
         settings = _convert_options(global_conf, local_conf)
         
         ok_(settings['mynone'] is None)
-        # "twod.none_settings" should have not been added:
+        ok_(settings['mynonewithspace'] is None)
         assert_false("twod.none_if_empty_settings" in settings)
         
     def test_non_if_empty_non_empty_settings(self):
@@ -348,13 +343,14 @@ class TestSettingsConvertion(object):
         
         global_conf = {
             'debug': "yes",
-            'twod.none_if_empty_settings': ("mynone", ),
+            'twod.none_if_empty_settings': ("mynone", "mynonewithspace"),
             }
-        local_conf = {'mynone': 'I am a string'}
+        local_conf = {'mynone': 'I am a string',
+                      'mynonewithspace': ' I am a string '}
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['mynone'], 'I am a string')
-        # "twod.none_settings" should have not been added:
+        eq_(settings['mynonewithspace'], 'I am a string')
         assert_false("twod.none_if_empty_settings" in settings)
     
     def test_strings(self):
