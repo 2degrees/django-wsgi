@@ -4,7 +4,7 @@
 # Copyright (c) 2010, 2degrees Limited <gustavonarea@2degreesnetwork.com>.
 # All Rights Reserved.
 #
-# This file is part of twod.wsgi <http://bitbucket.org/2degrees/twod.wsgi/>,
+# This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
 # which is subject to the provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -25,7 +25,7 @@ from django.core.handlers.wsgi import WSGIHandler
 from twod.wsgi.appsetup import (wsgify_django, _set_up_settings,
     _convert_options, _DJANGO_BOOLEANS, _DJANGO_INTEGERS,
     _DJANGO_NESTED_TUPLES, _DJANGO_TUPLES, _DJANGO_DICTIONARIES,
-    _DJANGO_UNSUPPORTED_SETTINGS)
+    _DJANGO_NONE_IF_EMPTY_SETTINGS, _DJANGO_UNSUPPORTED_SETTINGS)
 
 from tests import BaseDjangoTestCase
 
@@ -140,6 +140,8 @@ class TestSettingUpSettings(BaseDjangoTestCase):
         
         eq_(os.environ['DJANGO_SETTINGS_MODULE'], "tests.fixtures.list_module")
         eq_(list_module.DA_LIST, (1, 2, 3, 8, 9))
+        
+        
     
     def test_non_django_settings_module(self):
         """
@@ -201,7 +203,6 @@ class TestSettingsConvertion(object):
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['mybool'], False)
-        # "twod.booleans" should have not been added:
         assert_false("twod.booleans" in settings)
     
     def test_official_integers(self):
@@ -227,7 +228,6 @@ class TestSettingsConvertion(object):
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['myint'], 3)
-        # "twod.integers" should have not been added:
         assert_false("twod.integers" in settings)
     
     def test_official_tuples(self):
@@ -254,7 +254,6 @@ class TestSettingsConvertion(object):
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['mytuple'], items)
-        # "twod.tuples" should have not been added:
         assert_false("twod.tuples" in settings)
     
     def test_official_nested_tuples(self):
@@ -282,7 +281,6 @@ class TestSettingsConvertion(object):
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['my_nested_tuple'], nested_items)
-        # "twod.nested_tuples" should have not been added:
         assert_false("twod.nested_tuples" in settings)
     
     def test_official_dictionaries(self):
@@ -311,8 +309,49 @@ class TestSettingsConvertion(object):
         settings = _convert_options(global_conf, local_conf)
         
         eq_(settings['mydict'], {'foo': "bar", 'baz': "abc", 'xyz': "mno"})
-        # "twod.tuples" should have not been added:
         assert_false("twod.dictionaries" in settings)
+        
+    def test_official_none_if_empty_settings(self):
+        """Django's settings which are None if unspecified must be converted."""
+        
+        for setting_name in _DJANGO_NONE_IF_EMPTY_SETTINGS:
+            global_conf = {'debug': "yes"}
+            local_conf = {setting_name: ""}
+            settings = _convert_options(global_conf, local_conf)
+            
+            ok_(settings[setting_name] is None,
+                "%s must be NoneType, but it is %r" % (setting_name,
+                                                       settings[setting_name]),
+                )
+    
+    def test_custom_none_if_empty_settings(self):
+        """Custom NoneTypes should be converted."""
+
+        global_conf = {
+            'debug': "yes",
+            'twod.none_if_empty_settings': ("mynone", "mynonewithspace"),
+            }
+        local_conf = {'mynone': '', 'mynonewithspace': '    '}
+        settings = _convert_options(global_conf, local_conf)
+        
+        ok_(settings['mynone'] is None)
+        ok_(settings['mynonewithspace'] is None)
+        assert_false("twod.none_if_empty_settings" in settings)
+        
+    def test_non_if_empty_non_empty_settings(self):
+        """Non-empty 'none if empty' settings are left as strings."""
+        
+        global_conf = {
+            'debug': "yes",
+            'twod.none_if_empty_settings': ("mynone", "mynonewithspace"),
+            }
+        local_conf = {'mynone': 'I am a string',
+                      'mynonewithspace': ' I am a string '}
+        settings = _convert_options(global_conf, local_conf)
+        
+        eq_(settings['mynone'], 'I am a string')
+        eq_(settings['mynonewithspace'], 'I am a string')
+        assert_false("twod.none_if_empty_settings" in settings)
     
     def test_strings(self):
         """

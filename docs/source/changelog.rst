@@ -2,13 +2,20 @@
 Releases
 ========
 
-
 Unreleased
 ==========
 
 * Seek operations have been restricted to the ``wsgi.input`` of POST and PUT
   requests. This fixes a bug with Django Admin in Django 1.2 where a view
   gets the POST arguments even if the request is a GET one.
+
+
+Version 1.0.1 (2011-06-29)
+==========================
+
+Version 1.0.1 adds support for configuration variables which can either be 
+``None`` if left empty or strings otherwise. This functionality is useful when
+overriding settings in inherited blocks.
 
 
 Version 1.0 Final (2010-07-22)

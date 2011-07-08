@@ -4,7 +4,7 @@
 # Copyright (c) 2010, 2degrees Limited <gustavonarea@2degreesnetwork.com>.
 # All Rights Reserved.
 #
-# This file is part of twod.wsgi <http://bitbucket.org/2degrees/twod.wsgi/>,
+# This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
 # which is subject to the provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -152,6 +152,15 @@ _DJANGO_NESTED_TUPLES = frozenset([
 
 _DJANGO_DICTIONARIES = frozenset(["DATABASE_OPTIONS"])
 
+_DJANGO_NONE_IF_EMPTY_SETTINGS = frozenset([
+    "CSRF_COOKIE_DOMAIN",
+    "FILE_UPLOAD_TEMP_DIR",
+    "FORMAT_MODULE_PATH",
+    "SESSION_COOKIE_DOMAIN",
+    "SESSION_FILE_PATH",
+    "STATIC_URL",
+    ])
+
 # TODO: The following settings should be supported:
 _DJANGO_UNSUPPORTED_SETTINGS = frozenset([
     "FILE_UPLOAD_PERMISSIONS",
@@ -184,12 +193,17 @@ def _convert_options(global_conf, local_conf):
     custom_tuples = aslist(global_conf.get("twod.tuples", ""))
     custom_nested_tuples = aslist(global_conf.get("twod.nested_tuples", ""))
     custom_dictionaries = aslist(global_conf.get("twod.dictionaries", ""))
+    custom_none_if_empty_settings = aslist(
+        global_conf.get("twod.none_if_empty_settings", "")
+        )
     
     booleans = _DJANGO_BOOLEANS | frozenset(custom_booleans)
     integers = _DJANGO_INTEGERS | frozenset(custom_integers)
     tuples = _DJANGO_TUPLES | frozenset(custom_tuples)
     nested_tuples = _DJANGO_NESTED_TUPLES | frozenset(custom_nested_tuples)
     dictionaries = _DJANGO_DICTIONARIES | frozenset(custom_dictionaries)
+    none_if_empty_settings = (_DJANGO_NONE_IF_EMPTY_SETTINGS | 
+                              frozenset(custom_none_if_empty_settings))
     
     options = {}
     for (option_name, option_value) in local_conf.items():
@@ -212,6 +226,13 @@ def _convert_options(global_conf, local_conf):
                 (key.strip(), value.strip()) for (key, value) in items
                 )
             options[option_name] = dictionary
+        elif option_name in none_if_empty_settings:
+            value = option_value.strip()
+            if value:
+                value_to_use = value
+            else:
+                value_to_use = None
+            options[option_name] = value_to_use
         elif option_name in _DJANGO_UNSUPPORTED_SETTINGS:
             raise ValueError("Django setting %s is not (yet) supported; "
                              "you have to define it in your options module." %

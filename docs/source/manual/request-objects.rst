@@ -32,7 +32,7 @@ but better:
 
 :class:`Our new request class <twod.wsgi.handler.TwodWSGIRequest>` extends both
 :class:`~django.http.HttpRequest` and :class:`webob.Request`, and because the
-members of the former take precedence over the later, it's 100%
+members of the former take precedence over the latter, it's 100%
 compatible with the built-in request class in Django. :class:`webob.Response` is
 not used in *twod.wsgi*.
 

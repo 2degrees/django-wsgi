@@ -50,7 +50,7 @@ Configuring it from a PasteDeploy file will always take 3 additional lines:
   "egg:yourpackage#entry_point").
 
 You'll then need to make sure you load ``full_app`` instead of ``myapp``, since
-the later is presumably no longer able to serve media. To that end, you may
+the latter is presumably no longer able to serve media. To that end, you may
 consider renaming ``composite:full_app`` to ``composite:main``.
 
 

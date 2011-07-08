@@ -354,6 +354,74 @@ Dictionaries can be used almost the same way you use `nested tuples`_:
     # ...
 
 
+Settings which can be ``None`` or a string
+------------------------------------------
+
+Some settings need to be either a string or ``None`` when resolved to python.
+Settings which take this form will be converted to ``None`` if the value is
+empty, otherwise they will be left as a string.:
+
+.. code-block:: ini
+
+    [DEFAULT]
+    # ...
+    twod.none_if_empty_settings =
+        YOUR_POTENTIALLY_NONE_SETTING
+    # ...
+    
+    [app:main]
+    use egg:twod.wsgi
+    # ...
+    
+    # Built-in None value -- will get converted automatically:
+    FILE_UPLOAD_TEMP_DIR =
+        
+    
+    # Custom value to be None:
+    YOUR_POTENTIALLY_NONE_SETTING =
+    
+    # ...
+
+In this case, the following settings will be available::
+
+	>>> from django.conf import settings
+	>>> print settings.FILE_UPLOAD_TEMP_DIR
+	None
+	>>> print settings.YOUR_POTENTIALLY_NONE_SETTING
+	None
+
+Alternatively these two settings can be defined and will be left as strings:
+
+.. code-block:: ini
+
+    [DEFAULT]
+    # ...
+    twod.none_if_empty_settings =
+        YOUR_POTENTIALLY_NONE_SETTING
+    # ...
+    
+    [app:main]
+    use egg:twod.wsgi
+    # ...
+    
+    # Built-in None value -- will get converted automatically:
+    FILE_UPLOAD_TEMP_DIR = /tmp/twod/
+        
+    
+    # Custom value to be None:
+    YOUR_POTENTIALLY_NONE_SETTING = Something else
+    
+    # ...
+
+In this case, the following settings will be available::
+
+	>>> from django.conf import settings
+	>>> print settings.FILE_UPLOAD_TEMP_DIR
+	/tmp/twod/
+	>>> print settings.YOUR_POTENTIALLY_NONE_SETTING
+	Something else
+
+
 Unsupported settings
 --------------------
 
@@ -646,7 +714,7 @@ factory::
         
         return app
 
-``global_conf`` is a dictionary that contains all the options in the ``DEFAULT``
+``global_config`` is a dictionary that contains all the options in the ``DEFAULT``
 section, while ``local_conf`` will contain all the options in the ``app:*``
 section.
 
