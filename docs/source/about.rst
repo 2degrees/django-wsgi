@@ -62,12 +62,11 @@ long as:
 - There are unit tests for the new code.
 - The new code doesn't break existing functionality.
 
-Please go to `our development site on Bitbucket
-<http://bitbucket.org/2degrees/twod.wsgi/>`_ to get the 
-`latest code <http://bitbucket.org/2degrees/twod.wsgi/src/>`_,
-`create branches <http://bitbucket.org/2degrees/twod.wsgi/fork/>`_
-(and ask us to merge them into ours)
-and raise `issues <http://bitbucket.org/2degrees/twod.wsgi/issues/>`_.
+Please go to `our development site on GitHub
+<https://github.com/2degrees/twod.wsgi/>`_ to get the 
+`latest code <https://github.com/2degrees/twod.wsgi/download/>`_,
+fork it (and ask us to merge them into ours) and raise
+`issues <https://github.com/2degrees/twod.wsgi/issues/>`_.
 
 
 twod.wsgi versus...
