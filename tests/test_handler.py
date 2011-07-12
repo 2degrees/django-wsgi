@@ -181,10 +181,9 @@ class TestRequest(BaseDjangoTestCase):
                     Request(base_environ.copy()),
                     TwodWSGIRequest(base_environ.copy()))
 
-        old_input = environ['wsgi.input']
+        wsgi_input_body = environ['wsgi.input'].read()
         for request in requests:
-            request.environ['wsgi.input'] = StringIO(old_input.read())
-            old_input.seek(0)
+            request.environ['wsgi.input'] = StringIO(wsgi_input_body)
 
         return requests
 
