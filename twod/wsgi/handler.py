@@ -88,7 +88,7 @@ class TwodWSGIRequest(WSGIRequest, Request):
             self._seek_input()
     
     def _seek_input(self):
-        if self.environ['REQUEST_METHOD'] in ("POST", "PUT"):
+        if self.environ['REQUEST_METHOD'] in ("POST", "PUT", "PATCH"):
             self.environ['wsgi.input'].seek(0)
     
     #}

@@ -154,6 +154,13 @@ class TestRequest(BaseDjangoTestCase):
             'CONTENT_TYPE': "application/x-www-form-urlencoded",
             'wsgi.input': body,
             })
+        
+        patch_request = TwodWSGIRequest({
+            'REQUEST_METHOD': "PATCH",
+            'PATH_INFO': "/",
+            'CONTENT_TYPE': "application/x-www-form-urlencoded",
+            'wsgi.input': body,
+            })
 
         # Requests where seeks must NOT be performed:
         for request in (head_request, get_request):
@@ -162,7 +169,7 @@ class TestRequest(BaseDjangoTestCase):
             eq_(body.tell(), 3, "%s requests have no body" % request.method)
 
         # Requests where seeks MUST be performed:
-        for request in (post_request, put_request):
+        for request in (post_request, put_request, patch_request):
             body.seek(3)
             request._seek_input()
             eq_(body.tell(), 0, "%s requests have body" % request.method)
