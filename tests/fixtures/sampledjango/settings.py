@@ -91,5 +91,4 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     "tests.fixtures.sampledjango.app1",
     "tests.fixtures.sampledjango.app2",
-    "tests.fixtures.sampledjango.unsecured_app",
 )
