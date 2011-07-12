@@ -161,15 +161,15 @@ class TestCallWSGIApp(BaseDjangoTestCase):
             'arg3': {'value': "val3", 'path': "/"},
             'arg4': {'value': "val4", 'path': "/wiki"},
             'arg5': {'value': "val5", 'domain': ".example.org"},
-            'arg6': {'value': "val6", 'max-age': "3600"},
+            'arg6': {'value': "val6", 'max-age': 3600},
             'arg7': {
                 'value': "val7",
                 'expires': "Fri,%2031-Dec-2010%2023:59:59%20GMT",
                 'path': "/wiki",
                 'domain': ".example.org",
-                'max-age': "3600",
+                'max-age': 3600,
                 },
-            'arg8': {'value': "val8", 'max-age': "3600"},
+            'arg8': {'value': "val8", 'max-age': 3600},
             # Why the next item as disabled? Check the `headers` variable above
             #'arg9': {'value': "val9", 'secure': True},
             }
@@ -187,7 +187,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
                              (cookie_set_name, cookie_set.value))
             for (attr_key, attr_val) in expected_cookie.items():
                 eq_(cookie_set[attr_key], attr_val,
-                                 'Attribute "%s" in cookie "%s" is wrong (%s)' %
+                                 'Attribute "%s" in cookie %r is wrong (%r)' %
                                  (attr_key, cookie_set_name, cookie_set[attr_key]))
     
     def test_string_as_response(self):

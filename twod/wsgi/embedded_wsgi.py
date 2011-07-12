@@ -88,11 +88,15 @@ def call_wsgi_app(wsgi_app, request, path_info):
         cookie_attributes = {
             'key': cookie_name,
             'value': cookie.value,
-            'max_age': cookie.get("max-age"),
-            'expires': cookie.get("expires"),
-            'path': cookie.get("path", "/"),
-            'domain': cookie.get("domain"),
+            'expires': cookie['expires'],
+            'path': cookie['path'],
+            'domain': cookie['domain'],
             }
+        if cookie['max-age']:
+            # Starting in Django 1.3 it performs arithmetic operations
+            # with 'Max-Age'
+            cookie_attributes['max_age'] = int(cookie['max-age'])
+
         django_response.set_cookie(**cookie_attributes)
     return django_response
 
