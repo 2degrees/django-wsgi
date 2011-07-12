@@ -31,17 +31,6 @@ from twod.wsgi.handler import (TwodWSGIRequest, TwodResponse,
 from tests import BaseDjangoTestCase, MockStartResponse, complete_environ
 
 
-def get_test_environ(environ=None, **variables):
-    """Return a minimal valid WSGI environment for testing purposes"""
-    test_environ = {
-        'REQUEST_METHOD': 'GET',
-        'wsgi.input': StringIO(''),
-        }
-    test_environ.update(environ or {})
-    test_environ.update(variables)
-    return test_environ
-
-
 class TestRequest(BaseDjangoTestCase):
     """Tests for the enhanced request objects."""
 
@@ -57,12 +46,13 @@ class TestRequest(BaseDjangoTestCase):
         """
         input = urlencode({'foo': "bar", 'bar': "foo"})
         input_length = str(len(input))
-        environ = get_test_environ({
+        environ = {
             'REQUEST_METHOD': "POST",
             'CONTENT_TYPE': "application/x-www-form-urlencoded",
             'CONTENT_LENGTH': input_length,
             'wsgi.input': StringIO(input),
-            })
+            }
+        environ = complete_environ(**environ)
         (django_req, webob_req, twod_req) = self._make_requests(environ)
 
         eq_(twod_req.POST, django_req.POST)
@@ -87,9 +77,7 @@ class TestRequest(BaseDjangoTestCase):
         
         """
         qs = urlencode({'foo': "bar", 'bar': "foo"})
-        environ = get_test_environ({
-            'QUERY_STRING': qs,
-            })
+        environ = complete_environ(QUERY_STRING=qs)
         (django_req, webob_req, twod_req) = self._make_requests(environ)
 
         eq_(twod_req.GET, django_req.GET)
@@ -110,11 +98,12 @@ class TestRequest(BaseDjangoTestCase):
         POST request.
         
         """
-        environ = get_test_environ({
+        environ = {
             'REQUEST_METHOD': "POST",
             'CONTENT_TYPE': "application/x-www-form-urlencoded",
             'wsgi.input': StringIO(urlencode({'foo': "bar", 'bar': "foo"})),
-            })
+            }
+        environ = complete_environ(**environ)
         twod_request = TwodWSGIRequest(environ)
 
         ok_("CONTENT_LENGTH" not in twod_request.environ,
@@ -179,7 +168,7 @@ class TestRequest(BaseDjangoTestCase):
             eq_(body.tell(), 0, "%s requests have body" % request.method)
 
     def _make_requests(self, environ):
-        base_environ = get_test_environ(environ)
+        base_environ = complete_environ(**environ)
 
         requests = (WSGIRequest(base_environ.copy()),
                     Request(base_environ.copy()),
@@ -195,15 +184,14 @@ class TestRequest(BaseDjangoTestCase):
     #{ Testing WebOb ad-hoc attributes
 
     def test_getting_attributes(self):
-        environ = get_test_environ({
-            'webob.adhoc_attrs': {'foo': "bar"},
-            })
+        environ = {'webob.adhoc_attrs': {'foo': "bar"}}
+        environ = complete_environ(**environ)
         req = TwodWSGIRequest(environ)
         ok_(hasattr(req, "foo"))
         eq_(req.foo, "bar")
 
     def test_setting_attributes(self):
-        req = TwodWSGIRequest(get_test_environ())
+        req = TwodWSGIRequest(complete_environ())
         req.foo = "bar"
         ok_(hasattr(req, "foo"))
         eq_(req.foo, "bar")
@@ -216,9 +204,8 @@ class TestRequest(BaseDjangoTestCase):
         ok_("foo" in req.environ['webob.adhoc_attrs'])
 
     def test_deleting_attributes(self):
-        environ = get_test_environ({
-            'webob.adhoc_attrs': {'foo': "bar"},
-            })
+        environ = {'webob.adhoc_attrs': {'foo': "bar"}}
+        environ = complete_environ(**environ)
         req = TwodWSGIRequest(environ)
         del req.foo
         assert_false(hasattr(req, "foo"))
