@@ -290,16 +290,11 @@ class TestWSGIHandler(BaseDjangoTestCase):
 
     def test_right_request_class(self):
         """The WSGI handler must use Twod's request class."""
-        environ = {'REQUEST_METHOD': "GET"}
+        environ = complete_environ(REQUEST_METHOD="GET",
+                                   PATH_INFO="/app1/wsgi-view-ok/")
         def start_response(status, response_headers): pass
 
-        # We're going to get an exception because not all the environment keys
-        # are defined, but that doesn't matter because by that time we should
-        # already have the request object and that's all we need:
-        try:
-            self.handler(environ, start_response)
-        except KeyError:
-            pass
+        self.handler(environ, start_response)
 
         ok_(isinstance(self.handler.request, TwodWSGIRequest))
 
