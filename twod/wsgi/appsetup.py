@@ -141,13 +141,16 @@ _DJANGO_TUPLES = frozenset([
     "PROFANITIES_LIST",
     "TEMPLATE_CONTEXT_PROCESSORS",
     "TEMPLATE_DIRS",
-    "TEMPLATE_LOADERS",
     "TIME_INPUT_FORMATS",
     ])
 
 _DJANGO_NESTED_TUPLES = frozenset([
     "ADMINS",
     "MANAGERS",
+    ])
+
+_DJANGO_TREE_TUPLES = frozenset([
+    "TEMPLATE_LOADERS",
     ])
 
 _DJANGO_DICTIONARIES = frozenset(["DATABASE_OPTIONS"])
@@ -192,6 +195,7 @@ def _convert_options(global_conf, local_conf):
     custom_integers = aslist(global_conf.get("twod.integers", ""))
     custom_tuples = aslist(global_conf.get("twod.tuples", ""))
     custom_nested_tuples = aslist(global_conf.get("twod.nested_tuples", ""))
+    custom_tree_tuples = aslist(global_conf.get("twod.tree_tuples", ""))
     custom_dictionaries = aslist(global_conf.get("twod.dictionaries", ""))
     custom_none_if_empty_settings = aslist(
         global_conf.get("twod.none_if_empty_settings", "")
@@ -201,6 +205,7 @@ def _convert_options(global_conf, local_conf):
     integers = _DJANGO_INTEGERS | frozenset(custom_integers)
     tuples = _DJANGO_TUPLES | frozenset(custom_tuples)
     nested_tuples = _DJANGO_NESTED_TUPLES | frozenset(custom_nested_tuples)
+    tree_tuples = _DJANGO_TREE_TUPLES | frozenset(custom_tree_tuples)
     dictionaries = _DJANGO_DICTIONARIES | frozenset(custom_dictionaries)
     none_if_empty_settings = (_DJANGO_NONE_IF_EMPTY_SETTINGS | 
                               frozenset(custom_none_if_empty_settings))
@@ -219,6 +224,9 @@ def _convert_options(global_conf, local_conf):
                 for tuple_ in option_value.strip().splitlines()
                 )
             options[option_name] = nested_tuple
+        elif option_name in tree_tuples:
+            tree_tuple = as_tree_tuple(option_value)
+            options[option_name] = tree_tuple
         elif option_name in dictionaries:
             lines = option_value.strip().splitlines()
             items = [option.strip().split("=", 1) for option in lines]
@@ -246,5 +254,109 @@ def _convert_options(global_conf, local_conf):
     
     return options
 
+
+def as_tree_tuple(obj):
+    """Return the tree-like tuple represented by `obj`
+    
+    This tuples have a tree-like structure (nodes with zero or more children).
+    
+    """
+    return _parse_tree_tuple(obj.splitlines())[1]
+
+
+def _parse_tree_tuple(lines, indentation=0, current_line=0):
+    """Convert lines content to a tree-like tuple of strings.
+    
+    A deeper indentation block is considered as a nested tuple. If this
+    level contains only one element it won't be considered as a tuple
+    unless it's followed by a comma.
+    
+    :param:lines: Text to parse split into lines.
+    :type:lines: `list`
+    :param:indentation: Number of leading spaces of the last considered
+        line.
+    :param:current_line: Index that points to the that will be considered.
+    :return: A tuple with the index of the next line that has to be
+        parsed line and the partial result to that point.
+    
+    """
+    current_level_list = []
+    total_lines = len(lines)
+    
+    while current_line < total_lines:
+        line, current_indentation = _parse_tuple_element(lines, current_line)
+        element = line.strip()
+        
+        # Whitespace line: skip it
+        if not element:
+            current_line += 1
+        
+        # Upper level: This level has been parsed
+        elif current_indentation < indentation:
+            break
+        
+        # Same level: add the line as a sibling
+        else:
+            current_line += 1
+            
+            # Is there a lower level next?
+            next_line, next_indentation = _parse_tuple_element(lines,
+                                                               current_line)
+            # Lower level: Add it as a nested tuple
+            if next_line and next_indentation > current_indentation:
+                current_line, nested_tuple = _parse_tree_tuple(
+                    lines, next_indentation, current_line
+                    )
+                
+                # If there's only one string and it doesn't end with ','
+                # the tuple will be replaced with the element itself.
+                if (len(nested_tuple) == 1 and
+                    isinstance(nested_tuple[0], basestring) and
+                    nested_tuple[0][-1] != ','):
+                    nested_element = nested_tuple[0]
+                # Remove every trailing comma (if any).
+                else:
+                    cleaned_items = []
+                    for item in nested_tuple:
+                        if isinstance(item, basestring) and item[-1] == ',':
+                            cleaned_items.append(_clean_tuple_element(item))
+                        else:
+                            cleaned_items.append(item)
+                    nested_element = tuple(cleaned_items)
+                current_level_list.append(
+                    (_clean_tuple_element(element), nested_element)
+                    )
+            
+            else:
+                current_level_list.append(element)
+
+    return current_line, tuple(current_level_list)
+
+
+def _parse_tuple_element(lines, lineno):
+    """
+    Return the indentation and stripped version of `lines`[`lineno`] if it
+    exists.
+    
+    """
+    try:
+        line = lines[lineno]
+    except IndexError:
+        return None, None
+    else:
+        indentation = len(line) - len(line.lstrip())
+        return line, indentation
+    
+
+def _clean_tuple_element(element):
+    """
+    Return a copy of element without any surrounding space and trailing comma
+    (if any).
+    
+    """
+    if element[-1] == ',':
+        return element[:-1].strip()
+    else:
+        return element
 
 #}

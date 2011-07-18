@@ -25,7 +25,8 @@ from django.core.handlers.wsgi import WSGIHandler
 from twod.wsgi.appsetup import (wsgify_django, _set_up_settings,
     _convert_options, _DJANGO_BOOLEANS, _DJANGO_INTEGERS,
     _DJANGO_NESTED_TUPLES, _DJANGO_TUPLES, _DJANGO_DICTIONARIES,
-    _DJANGO_NONE_IF_EMPTY_SETTINGS, _DJANGO_UNSUPPORTED_SETTINGS)
+    _DJANGO_NONE_IF_EMPTY_SETTINGS, _DJANGO_UNSUPPORTED_SETTINGS,
+    as_tree_tuple, _DJANGO_TREE_TUPLES)
 
 from tests import BaseDjangoTestCase
 
@@ -406,4 +407,108 @@ class TestSettingsConvertion(object):
     def test_no_paste_debug(self):
         """Ensure the "debug" directive for Paste is set."""
         assert_raises(ValueError, _convert_options, {}, {})
+    
+    def test_official_tree_tuples(self):
+        """Django's tree tuple settings must be converted."""
+        definition = """ 
+            a
+                aa,
+                ab,
+            b
+                ba,
+                bb,
+            """
+        tree_tuple = (
+            ('a', ('aa', 'ab')),
+            ('b', ('ba', 'bb')),
+            )
+        
+        for setting_name in _DJANGO_TREE_TUPLES:
+            global_conf = {'debug': "yes"}
+            local_conf = {setting_name: "\n " + definition}
+            settings = _convert_options(global_conf, local_conf)
+            
+            eq_(settings[setting_name], tree_tuple)
+    
+    def test_custom_tree_tuple(self):
+        """Custom tree tuples should be converted."""
+        definition = """ 
+            a
+                aa,
+                ab,
+            b
+                ba,
+                bb,
+            """
+        tree_tuple = (
+            ('a', ('aa', 'ab')),
+            ('b', ('ba', 'bb')),
+            )
+        global_conf = {
+            'debug': "yes",
+            'twod.tree_tuples': ("my_tree_tuple", ),
+            }
+        local_conf = {'my_tree_tuple': "\n " + definition}
+        
+        settings = _convert_options(global_conf, local_conf)
+        
+        eq_(settings['my_tree_tuple'], tree_tuple)
+        assert_false("twod.tree_tuples" in settings)
 
+
+class TestTreeTuple(object):
+    
+    def test_two_levels(self):
+        """Generation of two-levels tuples""" 
+        definition = """ 
+            a
+                aa,
+                ab,
+            b
+                ba,
+                bb,
+            """
+        expected = (
+            ('a', ('aa', 'ab')),
+            ('b', ('ba', 'bb')),
+            )
+        
+        result = as_tree_tuple(definition)
+        eq_(result, expected)
+    
+    def test_three_levels(self):
+        """Generation of three-levels tuples""" 
+        definition = """ 
+            a
+                aa,
+                    aaa
+                ab,
+            """
+        expected = ('a', (('aa', 'aaa'), 'ab'))
+        
+        result = as_tree_tuple(definition)
+        eq_(result[0], expected)
+    
+    def test_single_element_with_comma(self):
+        """A trailing comma forces tuple creation for single elements""" 
+        definition = """ 
+            a
+                aa,
+            """
+        expected = (('a', ('aa',)),)
+        
+        result = as_tree_tuple(definition)
+        eq_(result, expected)
+
+    def test_single_element_without_comma(self):
+        """
+        A single element without a trailing comma is not inserted in a tuple
+        """ 
+        definition = """ 
+            a
+                aa
+            """
+        expected = (('a', 'aa'),)
+        
+        result = as_tree_tuple(definition)
+        eq_(result, expected)
