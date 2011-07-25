@@ -412,11 +412,11 @@ class TestSettingsConvertion(object):
         """Django's tree tuple settings must be converted."""
         definition = """ 
             a
-                aa,
-                ab,
+             - aa,
+             - ab,
             b
-                ba,
-                bb,
+             - ba,
+             - bb,
             """
         tree_tuple = (
             ('a', ('aa', 'ab')),
@@ -434,11 +434,11 @@ class TestSettingsConvertion(object):
         """Custom tree tuples should be converted."""
         definition = """ 
             a
-                aa,
-                ab,
+             - aa,
+             - ab,
             b
-                ba,
-                bb,
+             - ba,
+             - bb,
             """
         tree_tuple = (
             ('a', ('aa', 'ab')),
@@ -454,7 +454,7 @@ class TestSettingsConvertion(object):
         
         eq_(settings['my_tree_tuple'], tree_tuple)
         assert_false("twod.tree_tuples" in settings)
-
+    
 
 class TestTreeTuple(object):
     
@@ -462,11 +462,11 @@ class TestTreeTuple(object):
         """Generation of two-levels tuples""" 
         definition = """ 
             a
-                aa,
-                ab,
+             - aa,
+             - ab,
             b
-                ba,
-                bb,
+             - ba,
+             - bb,
             """
         expected = (
             ('a', ('aa', 'ab')),
@@ -480,9 +480,9 @@ class TestTreeTuple(object):
         """Generation of three-levels tuples""" 
         definition = """ 
             a
-                aa,
-                    aaa
-                ab,
+             - aa,
+              -- aaa
+             - ab,
             """
         expected = ('a', (('aa', 'aaa'), 'ab'))
         
@@ -493,9 +493,10 @@ class TestTreeTuple(object):
         """A trailing comma forces tuple creation for single elements""" 
         definition = """ 
             a
-                aa,
+             - aa,
+            b
             """
-        expected = (('a', ('aa',)),)
+        expected = (('a', ('aa',)), 'b')
         
         result = as_tree_tuple(definition)
         eq_(result, expected)
@@ -506,9 +507,10 @@ class TestTreeTuple(object):
         """ 
         definition = """ 
             a
-                aa
+             - aa
+            b
             """
-        expected = (('a', 'aa'),)
+        expected = (('a', 'aa'), 'b')
         
         result = as_tree_tuple(definition)
         eq_(result, expected)

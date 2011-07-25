@@ -28,6 +28,10 @@ from twod.wsgi.handler import DjangoApplication
 
 __all__ = ("wsgify_django", )
 
+
+_TUPLE_INDENTATION_SYMBOL = "-"
+"""Symbol used to denote an indentation level for tree tuples""" 
+
 _LOGGER = getLogger(__name__)
 
 
@@ -344,8 +348,12 @@ def _parse_tuple_element(lines, lineno):
     except IndexError:
         return None, None
     else:
-        indentation = len(line) - len(line.lstrip())
-        return line, indentation
+        indentation = 0
+        for c in line:
+            if c == _TUPLE_INDENTATION_SYMBOL:
+                indentation += 1
+
+        return line.strip(" " + _TUPLE_INDENTATION_SYMBOL), indentation
     
 
 def _clean_tuple_element(element):
