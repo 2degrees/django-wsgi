@@ -14,6 +14,7 @@ Additionally, the following changes were made:
 * Removed support for custom status reason
 * Removed ``TwodResponse`` class - now uses :class:`django.http.HttpResponse`
 * Removed ``easy_install`` boilerplate from ``setup.py``
+* Removed ability to import directly from :mod:`twod.wsgi`
 * Seek operations have been restricted to the ``wsgi.input`` of POST and PUT
   requests. This fixes a bug with Django Admin in Django 1.2 where a view
   gets the POST arguments even if the request is a GET one.
