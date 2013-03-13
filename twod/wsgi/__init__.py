@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2010, 2degrees Limited <gustavonarea@2degreesnetwork.com>.
+# Copyright (c) 2010, 2013, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
@@ -13,16 +13,3 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""
-Enhanced WSGI support for Django applications.
-
-"""
-
-# Importing elements that should be available from this namespace:
-from twod.wsgi.handler import DjangoApplication, TwodResponse
-from twod.wsgi.middleware import RoutingArgsMiddleware
-from twod.wsgi.embedded_wsgi import call_wsgi_app, make_wsgi_view
-from twod.wsgi.appsetup import wsgify_django
-
-__all__ = ("DjangoApplication", "TwodResponse", "RoutingArgsMiddleware",
-           "call_wsgi_app", "make_wsgi_view", "wsgify_django")

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2010, 2degrees Limited <gustavonarea@2degreesnetwork.com>.
+# Copyright (c) 2010, 2013, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
@@ -18,7 +18,6 @@ Test suite for :mod:`twod.wsgi`.
 
 """
 from StringIO import StringIO
-import logging
 import os
 
 import django.conf
@@ -30,54 +29,18 @@ class BaseDjangoTestCase(object):
     
     """
     
-    django_settings_module = "tests.fixtures.sampledjango.settings"
+    django_settings_module = "tests.dummy_django_project.settings"
     
     setup_fixture = True
     
     def setup(self):
         if self.setup_fixture:
             os.environ['DJANGO_SETTINGS_MODULE'] = self.django_settings_module
-        # Setting up the logging fixture:
-        self.logging_handler = LoggingHandlerFixture()
-        self.logs = self.logging_handler.handler.messages
     
     def teardown(self):
-        self.logging_handler.undo()
         django.conf.settings = django.conf.LazySettings()
         if "DJANGO_SETTINGS_MODULE" in os.environ:
             del os.environ['DJANGO_SETTINGS_MODULE']
-
-
-class MockLoggingHandler(logging.Handler):
-    """Mock logging handler to check for expected log entries."""
-    
-    def __init__(self, *args, **kwargs):
-        self.reset()
-        logging.Handler.__init__(self, *args, **kwargs)
-
-    def emit(self, record):
-        self.messages[record.levelname.lower()].append(record.getMessage())
-    
-    def reset(self):
-        self.messages = {
-            'debug': [],
-            'info': [],
-            'warning': [],
-            'error': [],
-            'critical': [],
-        }
-
-
-class LoggingHandlerFixture(object):
-    """Manager of the :class:`MockLoggingHandler`s."""
-    
-    def __init__(self):
-        self.logger = logging.getLogger("twod.wsgi")
-        self.handler = MockLoggingHandler()
-        self.logger.addHandler(self.handler)
-    
-    def undo(self):
-        self.logger.removeHandler(self.handler)
 
 
 #{ Mock WSGI apps
@@ -152,22 +115,6 @@ class ClosingAppIter(list):
     
     def close(self):
         self.closed = True
-
-
-class MockStartResponse(object):
-    """Mock start_response() callable which keeps the arguments it receives."""
-    
-    def __init__(self):
-        self.status = None
-        self.response_headers = None
-        self.exc_info = None
-        self.called = False
-    
-    def __call__(self, status, response_headers, exc_info=None):
-        self.status = status
-        self.response_headers = response_headers
-        self.exc_info = exc_info
-        self.called = True
 
 
 def complete_environ(**environ):

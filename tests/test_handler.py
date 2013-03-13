@@ -290,8 +290,7 @@ class TestWSGIHandler(BaseDjangoTestCase):
 
     def test_right_request_class(self):
         """The WSGI handler must use Twod's request class."""
-        environ = complete_environ(REQUEST_METHOD="GET",
-                                   PATH_INFO="/app1/wsgi-view-ok/")
+        environ = complete_environ(REQUEST_METHOD="GET", PATH_INFO="/")
         def start_response(status, response_headers): pass
 
         self.handler(environ, start_response)

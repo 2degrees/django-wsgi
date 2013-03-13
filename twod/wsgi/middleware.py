@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2010, 2degrees Limited <gustavonarea@2degreesnetwork.com>.
+# Copyright (c) 2010, 2013, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
@@ -30,4 +30,3 @@ class RoutingArgsMiddleware(object):
     
     def process_view(self, request, view_func, view_args, view_kwargs):
         request.environ['wsgiorg.routing_args'] = (view_args, view_kwargs.copy())
-
