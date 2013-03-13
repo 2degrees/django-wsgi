@@ -48,9 +48,7 @@ setup(name="twod.wsgi",
       license="BSD (http://dev.2degreesnetwork.com/p/2degrees-license.html)",
       packages=find_packages(exclude=["tests"]),
       zip_safe=False,
-      tests_require = [
-        "coverage",
-        ],
+      tests_require=["coverage", "nose"],
       install_requires=[
         "Django >= 1.1",
         "WebOb >= 0.9.7, < 1.0dev",
