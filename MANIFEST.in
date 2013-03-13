@@ -2,7 +2,6 @@ include LICENSE.txt
 include README.txt
 include VERSION.txt
 include MANIFEST.in
-include ez_setup.py
 
 recursive-exclude tests/ *
 recursive-exclude docs/ *
