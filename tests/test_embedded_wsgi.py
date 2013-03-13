@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2009-2010, 2degrees Limited <gustavonarea@2degreesnetwork.com>.
+# Copyright (c) 2009-2010, 2013, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
@@ -19,7 +19,7 @@ Tests for the use of WSGI applications within Django.
 """
 from nose.tools import eq_, ok_, assert_false, assert_raises
 
-from twod.wsgi import call_wsgi_app, make_wsgi_view
+from twod.wsgi.embedded_wsgi import call_wsgi_app, make_wsgi_view
 from twod.wsgi.handler import TwodWSGIRequest
 from twod.wsgi.exc import ApplicationCallError
 
@@ -98,20 +98,6 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         assert_raises(ApplicationCallError, call_wsgi_app, app, request,
                       path_info)
     
-    def test_http_status(self):
-        environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/trac/wiki")
-        request = _make_request(**environ)
-        # Running the app and make a valid request:
-        app_ok = MockApp("200 Alright", [])
-        django_response_ok = call_wsgi_app(app_ok, request, "/wiki")
-        eq_(200, django_response_ok.status_code)
-        eq_("Alright", django_response_ok.status_reason)
-        # Running the app and make an invalid request:
-        app_bad = MockApp("403 What are you trying to do?", [])
-        django_response_bad = call_wsgi_app(app_bad, request, "/wiki")
-        eq_(403, django_response_bad.status_code)
-        eq_("What are you trying to do?", django_response_bad.status_reason)
-    
     def test_headers_are_copied_over(self):
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/trac/wiki")
         request = _make_request(**environ)
@@ -123,7 +109,6 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         expected_headers = {
             'x-foo': ("X-Foo", "bar"),
             'content-type': ("Content-Type", "text/plain"),
-            'x-actual-status-reason': ("X-Actual-Status-Reason", "200 OK"),
             }
         # Running the app:
         app = MockApp("200 OK", headers)
@@ -200,7 +185,6 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         http_response = (
             "X-HEADER: Foo\n"
             "Content-Type: text/html; charset=utf-8\n"
-            "X-Actual-Status-Reason: 200 It is OK\n"
             "\n"
             "body"
             )
@@ -213,12 +197,10 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         request = _make_request(**environ)
         django_response = call_wsgi_app(app, request, "/posts")
         # Checking the response:
-        assert_false(django_response._is_string)
         ok_(django_response.has_header("X-HEADER"))
         http_response = (
             "X-HEADER: Foo\n"
             "Content-Type: text/html; charset=utf-8\n"
-            "X-Actual-Status-Reason: 200 It is OK\n"
             "\n"
             "body as iterable"
             )
@@ -231,12 +213,10 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         request = _make_request(**environ)
         django_response = call_wsgi_app(app, request, "/posts")
         # Checking the response:
-        assert_false(django_response._is_string)
         ok_(django_response.has_header("X-HEADER"))
         http_response = (
             "X-HEADER: Foo\n"
             "Content-Type: text/html; charset=utf-8\n"
-            "X-Actual-Status-Reason: 200 It is OK\n"
             "\n"
             "body as iterable"
             )

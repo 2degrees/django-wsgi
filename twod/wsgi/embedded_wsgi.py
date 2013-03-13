@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2009-2010, 2degrees Limited <gustavonarea@2degreesnetwork.com>.
+# Copyright (c) 2009-2010, 2013, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
@@ -20,7 +20,8 @@ Utilities to use WSGI applications within Django.
 
 from Cookie import SimpleCookie
 
-from twod.wsgi import TwodResponse
+from django.http import HttpResponse
+
 from twod.wsgi.exc import ApplicationCallError
 
 
@@ -41,7 +42,7 @@ def call_wsgi_app(wsgi_app, request, path_info):
         last portion of the ``PATH_INFO`` in ``request``.
     :return: The response from the WSGI application, turned into a Django
         response.
-    :rtype: :class:`twod.wsgi.TwodResponse`
+    :rtype: :class:`django.http.HttpResponse`
     
     """
     new_request = request.copy()
@@ -69,11 +70,14 @@ def call_wsgi_app(wsgi_app, request, path_info):
         del new_request.environ['webob.adhoc_attrs']
     
     # Calling the WSGI application and getting its response:
-    (status, headers, body) = new_request.call_application(wsgi_app)
+    (status_line, headers, body) = new_request.call_application(wsgi_app)
+    
+    status_code_raw = status_line.split(" ", 1)[0]
+    status_code = int(status_code_raw)
     
     # Turning its response into a Django response:
     cookies = SimpleCookie()
-    django_response = TwodResponse(body, status=status)
+    django_response = HttpResponse(body, status=status_code)
     for (header, value) in headers:
         if header.upper() == "SET-COOKIE":
             if isinstance(value, unicode):
@@ -115,4 +119,3 @@ def make_wsgi_view(wsgi_app):
         return call_wsgi_app(wsgi_app, request, path_info)
     
     return view
-
