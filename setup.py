@@ -51,7 +51,6 @@ setup(name="twod.wsgi",
       install_requires=[
         "Django >= 1.1",
         "WebOb >= 0.9.7, < 1.0dev",
-        "Paste >= 1.7.2, <= 1.7.5.1",
         "setuptools",
         ],
       test_suite="nose.collector",
