@@ -8,13 +8,9 @@ Table of contents
 .. toctree::
    :maxdepth: 2
    
-   paste-factory
    request-objects
    embedded-apps
-   media-apps
    routing-args
-   responses
-   testing
 
 
 Introduction
@@ -38,18 +34,11 @@ absolutely independent projects. And `cooperation is the key
 Django crosses this bridge. It is a very simple library made up of the following
 components:
 
-- A `PasteDeploy <http://pythonpaste.org/deploy/>`_ application factory -- which
-  is possibly the flagship of the project.
 - Functions to run WSGI applications inside Django reliably.
 - An :class:`~django.http.HttpRequest` class extended by the fully-featured
   :class:`webob.Request` (which is absolutely backwards compatible).
-- An optional :class:`~django.http.HttpResponse` class that supports custom HTTP status
-  reason phrases, as allowed by the HTTP and WSGI specifications (which is
-  absolutely backwards compatible).
 - A Django middleware which implements the `wsgiorg.routing_args
   <http://wsgi.org/wsgi/Specifications/routing_args>`_ standard.
-- And yet another `Nose <http://somethingaboutorange.com/mrl/projects/nose/>`_
-  plugin for Django, but this one is adapted to the PasteDeploy factory.
 
 The author, who is a core developer at some mainstream WSGI projects, believes
 these components bring Django to the same level as frameworks like TurboGears, as

@@ -4,7 +4,6 @@ API documentation for :mod:`twod.wsgi`
 
 .. automodule:: twod.wsgi
     :synopsis: Enhanced WSGI support for Django
-    :members: DjangoApplication, TwodResponse
     :show-inheritance:
 
 
@@ -14,15 +13,9 @@ API documentation for :mod:`twod.wsgi`
 Embedded applications
 =====================
 
-.. autofunction:: make_wsgi_view
+.. autofunction:: twod.wsgi.embedded_wsgi.make_wsgi_view
 
-.. autofunction:: call_wsgi_app
-
-
-Media serving
-=============
-
-.. autofunction:: twod.wsgi.factories.add_media_to_app
+.. autofunction:: twod.wsgi.embedded_wsgi.call_wsgi_app
 
 
 Exceptions

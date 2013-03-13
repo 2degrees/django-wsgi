@@ -5,8 +5,7 @@
 *twod.wsgi* extends Django's WSGI handler
 (:class:`django.core.handlers.wsgi.WSGIHandler`) and the
 :class:`~django.http.HttpRequest` class, so our handler uses our extended
-request class. This handler is used when you use the :doc:`paste-factory`, but
-you can still use the handler without it.
+request class.
 
 As mentioned before, what Django calls "handler" is actually a generic WSGI
 application that wraps your Django project. We'll stick to "WSGI application"
@@ -59,17 +58,9 @@ members of your request objects.
 Using the WSGI application directly
 -----------------------------------
 
-If you're not using the :doc:`paste-factory`, you can import it as you would
-normally do in Django::
+You can import it as you would normally do in Django::
 
     from os import environ
     environ['DJANGO_SETTINGS_MODULE'] = "yourpackage.settings"
     
     from twod.wsgi import DjangoApplication
-
-If you do use the application factory, but still need to create an instance of
-the generic WSGI application for your Django project (e.g., for testing
-purposes), you could just do::
-
-    from twod.wsgi import DjangoApplication
-

@@ -21,10 +21,6 @@ some enterprise requirements for Django
 - It's now possible to run code at startup time, in a straight-forward yet
   extremely flexible fashion, which will also work on development servers if you
   want it to -- not only when deployed on a production server.
-- You can now stop using a Python module to store your application settings, in
-  order to use an intuitive and widely used mechanism that scales up and scales
-  down. It will just work and you won't have to update any other file in your
-  application.
 - It's finally possible to run WSGI middleware in development servers, the same
   way you may do it on production servers.
 
@@ -43,9 +39,8 @@ Finally, it's worth mentioning that:
   our implementation or someone else's. Before deciding to start an independent
   project, we had already offered our help to people within the Django community
   working towards similar aims and the offer still stands.
-- It is known to work with Django 1.1.1 and Python 2.5, and we expect it to
-  work with Django 1.1-1.2 and Python 2.4-2.6 too -- Please let us know if it
-  doesn't.
+- It is known to work with Django 1.1.1-1.4.5 and Python 2.5-2.7.
+  Please let us know if it doesn't.
 
 You may want to start by checking `our presentation at the Django User Group in London
 <http://gustavonarea.net/files/talks/twodwsgi-djugl.pdf>`_ (for a high-level

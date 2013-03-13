@@ -116,29 +116,6 @@ We're also not sure if it's usable:
   (i.e., ``REMOTE_USER``).
 - We don't see the point in running Django views as WSGI applications. It's
   also inconvenient because no Django middleware gets run, neither do routines
-  set by Django's WSGI handler. [#standalone-django]_
+  set by Django's WSGI handler.
 
 Although these may be bugs, not the intended behaviour.
-
-
-.. rubric:: Footnotes
-
-.. [#standalone-django] If you really wanted to collect individual views into
-  an standalone Django-powered WSGI application, a safer approach would be to:
-  
-  #. Define the ``URLConf`` for that application (say, at ``your_package.urls_subset``).
-  #. Extend the existing PasteDeploy configuration for the main/complete
-     application, like this:
-    
-    .. code-block:: ini
-    
-        [app:standalone_subset]
-        use = existing_main_application
-        ROOT_URLCONF = your_package.urls_subset
-        
-  #. Use the "standalone_subset" version of your application::
-  
-      from paste.deploy import loadapp
-      
-      smaller_app = loadapp("config:/path/to/config.ini#standalone_subset")
-

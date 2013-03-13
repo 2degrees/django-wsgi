@@ -14,11 +14,6 @@ Additionally, the following changes were made:
 * Removed support for custom status reason
 * Removed ``TwodResponse`` class - now uses :class:`django.http.HttpResponse`
 * Removed ``easy_install`` boilerplate from ``setup.py``
-
-
-Version 1.1 Alpha 1
-===================
-
 * Seek operations have been restricted to the ``wsgi.input`` of POST and PUT
   requests. This fixes a bug with Django Admin in Django 1.2 where a view
   gets the POST arguments even if the request is a GET one.
@@ -62,7 +57,7 @@ Version 1.0 Alpha 4 (2010-03-29)
   powered WSGI application and returns a WSGI application which serves the
   entire Web site (including the media).
 * Fixed typos in the documentation: The ``django_settings_module`` option in
-  :doc:`manual/paste-factory` was being put in the ``[DEFAULT]`` section;
+  ``paste-factory`` was being put in the ``[DEFAULT]`` section;
   the right location is an application section.
 * Paste itself was not a requirement in :file:`setup.py`, people who didn't
   have it installed already would get :class:`ImportError` exceptions.
