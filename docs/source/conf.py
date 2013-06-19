@@ -48,7 +48,7 @@ copyright = u'2010-2013, 2degrees Limited'
 # built documents.
 #
 # The short X.Y version.
-version = '1.0'
+version = '2.0'
 # The full version, including alpha/beta/rc tags.
 release = open(os.path.join(root, 'VERSION.txt')).readline().rstrip()
 

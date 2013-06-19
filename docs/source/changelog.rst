@@ -2,23 +2,25 @@
 Releases
 ========
 
-Unreleased
-==========
+Version 2 Beta 1 (2013-06-19)
+=============================
 
-Version 2.0 splits the configuration-related functionality away from twod.wsgi
-as it is not strictly to do with making Django WSGI compliant. This code is now
-available at https://github.com/2degrees/django-pastedeploy-settings.
+This release is backwards incompatible with v1.
+
+The most significant change is that the configuration-related functionality has
+been split away from **twod.wsgi**, as it is not strictly to do with improving
+Django-WSGI interoperability. This functionality is now available in the project
+`django-pastedeploy-settings
+<http://pythonhosted.org/django-pastedeploy-settings/>`_.
 
 Additionally, the following changes were made:
 
-* Removed support for custom status reason
-* Removed ``TwodResponse`` class - now uses :class:`django.http.HttpResponse`
-* Removed ``easy_install`` boilerplate from ``setup.py``
-* Removed ability to import directly from :mod:`twod.wsgi`
+* Removed the class ``TwodResponse``, which supported the setting of custom
+  HTTP status reasons, since newer versions of Django now support this.
+* Removed ability to import directly from the package :mod:`twod.wsgi`.
 * Seek operations have been restricted to the ``wsgi.input`` of POST and PUT
   requests. This fixes a bug with Django Admin in Django 1.2 where a view
   gets the POST arguments even if the request is a GET one.
-* Added support for tree tuples (e.g. ``TEMPLATE_LOADERS`` setting).
 
 
 Version 1.0.1 (2011-06-29)
