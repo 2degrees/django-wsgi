@@ -159,7 +159,7 @@ example, you wanted to set the ``Server`` header, you could do it like this::
         response['Server'] = "twod.wsgi 1.0"
         return response
 
-.. warning:: **Avoid reading the body of a request!**
+.. warning:: **Avoid reading the body of a response!**
     
     The body of some responses may be generators, which are useful when the
     response is so big that has to be sent in chunks (e.g., a video).
