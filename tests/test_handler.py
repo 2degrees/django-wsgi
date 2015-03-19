@@ -152,7 +152,7 @@ class TestRequest(BaseDjangoTestCase):
             'CONTENT_TYPE': "application/x-www-form-urlencoded",
             'wsgi.input': body,
             })
-        
+
         patch_request = TwodWSGIRequest({
             'REQUEST_METHOD': "PATCH",
             'PATH_INFO': "/",
@@ -199,12 +199,9 @@ class TestRequest(BaseDjangoTestCase):
         req.foo = "bar"
         ok_(hasattr(req, "foo"))
         eq_(req.foo, "bar")
-        # Making sure they're in the WebOb ad-hoc attributes dict, with nothing
-        # else:
+
+        # Ensure it's also in the WebOb ad-hoc attributes dict
         ok_("webob.adhoc_attrs" in req.environ)
-        eq_(len(req.environ['webob.adhoc_attrs']), 1,
-            "WebOb.Request has the following ad-hoc attributes: %s" %
-            req.environ['webob.adhoc_attrs'])
         ok_("foo" in req.environ['webob.adhoc_attrs'])
 
     def test_deleting_attributes(self):
