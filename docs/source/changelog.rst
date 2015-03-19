@@ -2,6 +2,12 @@
 Releases
 ========
 
+Version 2 Release Candidate 1 (unreleased)
+==========================================
+
+Made compatible with Django up to version 1.6.
+
+
 Version 2 Beta 1 (2013-06-19)
 =============================
 
