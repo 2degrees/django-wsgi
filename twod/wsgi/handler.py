@@ -17,14 +17,15 @@
 Django request/response handling a la WSGI.
 
 """
-from django.core.handlers.wsgi import WSGIRequest, WSGIHandler
-from webob import Request
+from django.core.handlers.wsgi import WSGIHandler
+from django.core.handlers.wsgi import WSGIRequest as DjangoRequest
+from webob import Request as WebobRequest
 
 
 __all__ = ("TwodWSGIRequest", "DjangoApplication")
 
 
-class TwodWSGIRequest(WSGIRequest, Request):
+class TwodWSGIRequest(DjangoRequest, WebobRequest):
     """
     Pythonic proxy for the WSGI environment.
     
@@ -47,14 +48,13 @@ class TwodWSGIRequest(WSGIRequest, Request):
     META = None
     
     def __init__(self, environ):
-        Request.__init__(self, environ)
-        WSGIRequest.__init__(self, environ)
-    
+        WebobRequest.__init__(self, environ)
+        DjangoRequest.__init__(self, environ)
     #{ Handing arguments
-    
-    uPOST = Request.POST
-    uGET = Request.GET
-    
+
+    uPOST = WebobRequest.POST
+    uGET = WebobRequest.GET
+
     # webob.Request
     @property
     def str_POST(self):
@@ -71,7 +71,7 @@ class TwodWSGIRequest(WSGIRequest, Request):
             self.environ['CONTENT_LENGTH'] = original_content_length
             # "Resetting" the input so Django will read it:
             self._seek_input()
-    
+
     # django.core.handlers.wsgi.WSGIRequest
     def _load_post_and_files(self):
         """
@@ -83,11 +83,11 @@ class TwodWSGIRequest(WSGIRequest, Request):
         finally:
             # "Resetting" the input so WebOb will read it:
             self._seek_input()
-    
+
     def _seek_input(self):
         if self.environ['REQUEST_METHOD'] in ("POST", "PUT", "PATCH"):
             self.environ['wsgi.input'].seek(0)
-    
+
     #}
 
 
