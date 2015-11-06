@@ -1,0 +1,11 @@
+language: python
+sudo: false
+python:
+  - "2.7"
+  - "pypy"
+install: pip install .
+before_script:
+  - pip install -r tests/requirements.txt
+script:  coverage run --source=twod.wsgi setup.py test
+after_success:
+  - coveralls
