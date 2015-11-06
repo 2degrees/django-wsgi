@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2009-2010, 2013, 2degrees Limited.
+# Copyright (c) 2009-2015, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
@@ -45,7 +45,8 @@ def call_wsgi_app(wsgi_app, request, path_info):
     :rtype: :class:`django.http.HttpResponse`
     
     """
-    new_request = request.copy()
+    webob_request = request.webob
+    new_request = webob_request.copy()
     
     # Moving the portion of the path consumed by the current view, from the
     # PATH_INTO to the SCRIPT_NAME:
@@ -55,7 +56,7 @@ def call_wsgi_app(wsgi_app, request, path_info):
                                    % (path_info, request.path_info))
     consumed_path = request.path_info[:-len(path_info)]
     new_request.path_info = path_info
-    new_request.script_name = request.script_name + consumed_path
+    new_request.script_name = webob_request.script_name + consumed_path
     
     # If the user has been authenticated in Django, log him in the WSGI app:
     if request.user.is_authenticated():

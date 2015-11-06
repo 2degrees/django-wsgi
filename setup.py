@@ -50,7 +50,7 @@ setup(name="twod.wsgi",
       tests_require=["coverage", "nose"],
       install_requires=[
         "Django >= 1.1",
-        "WebOb >= 0.9.7, < 1.0dev",
+        "WebOb >= 1.5",
         "setuptools",
         ],
       test_suite="nose.collector",

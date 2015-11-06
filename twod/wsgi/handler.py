@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2010, 2013, 2degrees Limited.
+# Copyright (c) 2010-2015, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
@@ -25,7 +25,7 @@ from webob import Request as WebobRequest
 __all__ = ("TwodWSGIRequest", "DjangoApplication")
 
 
-class TwodWSGIRequest(DjangoRequest, WebobRequest):
+class TwodWSGIRequest(DjangoRequest):
     """
     Pythonic proxy for the WSGI environment.
     
@@ -38,57 +38,22 @@ class TwodWSGIRequest(DjangoRequest, WebobRequest):
     and ``.uPOST`` respectively.
     
     """
-    
-    # The following are used as attributes by Django's request class instances.
-    # If we don't set them class-wide, WebOb is going to put them into its
-    # ``webob.adhoc_attrs`` variable. See webob.Request:__setattr__.
-    environ = None
-    path = None
-    method = None
-    META = None
-    
+
     def __init__(self, environ):
-        WebobRequest.__init__(self, environ)
-        DjangoRequest.__init__(self, environ)
-    #{ Handing arguments
-
-    uPOST = WebobRequest.POST
-    uGET = WebobRequest.GET
-
-    # webob.Request
-    @property
-    def str_POST(self):
-        """
-        Return the POST arguments by using WebOb.
-        
-        """
-        # Before returning the POST arguments, we have to restore the content
-        # length, which is reset by WebOb:
-        original_content_length = self.environ.get("CONTENT_LENGTH")
-        try:
-            return super(TwodWSGIRequest, self).str_POST
-        finally:
-            self.environ['CONTENT_LENGTH'] = original_content_length
-            # "Resetting" the input so Django will read it:
-            self._seek_input()
+        webob_request = WebobRequest(environ)
+        super(TwodWSGIRequest, self).__init__(environ)
+        self.webob = webob_request
 
     # django.core.handlers.wsgi.WSGIRequest
-    def _load_post_and_files(self):
-        """
-        Parse the POST arguments and uploaded files by using Django.
-        
-        """
+    def read(self, *args, **kwargs):
+        # Make environ['wsgi.input'] readable by Django, if WebOb read it
+        self._stream.stream.seek(0)
+
         try:
-            return super(TwodWSGIRequest, self)._load_post_and_files()
+            return super(TwodWSGIRequest, self).read()
         finally:
-            # "Resetting" the input so WebOb will read it:
-            self._seek_input()
-
-    def _seek_input(self):
-        if self.environ['REQUEST_METHOD'] in ("POST", "PUT", "PATCH"):
-            self.environ['wsgi.input'].seek(0)
-
-    #}
+            # Make environ['wsgi.input'] readable by WebOb
+            self._stream.stream.seek(0)
 
 
 class DjangoApplication(WSGIHandler):
@@ -96,4 +61,5 @@ class DjangoApplication(WSGIHandler):
     Django request handler which uses our enhanced WSGI request class.
     
     """
+
     request_class = TwodWSGIRequest

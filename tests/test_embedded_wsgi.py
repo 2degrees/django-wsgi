@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2009-2010, 2013, 2degrees Limited.
+# Copyright (c) 2009-2015, 2degrees Limited.
 # All Rights Reserved.
 #
 # This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
@@ -35,17 +35,21 @@ class TestCallWSGIApp(BaseDjangoTestCase):
 
     def test_original_environ_not_modified(self):
         """The original environ must have not been modified."""
-        original_environ = complete_environ(SCRIPT_NAME="/blog",
-                                            PATH_INFO="/admin/models")
+        original_environ = \
+            complete_environ(SCRIPT_NAME="/blog", PATH_INFO="/admin/models")
         expected_environ = original_environ.copy()
         request = _make_request(**original_environ)
         # Running the app:
         app = MockApp("200 OK", [])
         call_wsgi_app(app, request, "/models")
-        # Checking the environment after calling the WSGI application, but first
-        # let's remove WebOb's ad-hoc attributes:
-        del request.environ['webob.adhoc_attrs']
-        eq_(request.environ, expected_environ)
+        eq_(expected_environ.keys(), request.environ.keys())
+        for variable_name, expected_variable_value in expected_environ.items():
+            if variable_name == 'wsgi.input':
+                actual_input = request.environ['wsgi.input']
+                eq_(0, actual_input.tell())
+                eq_('', actual_input.read())
+            else:
+                eq_(expected_variable_value, request.environ[variable_name])
 
     def test_routing_args_are_removed(self):
         """The ``wsgiorg.routing_args`` environment key must be removed."""
