@@ -19,6 +19,7 @@ Tests for the use of WSGI applications within Django.
 """
 from nose.tools import eq_, ok_, assert_false, assert_raises
 
+from six import b
 from twod.wsgi.embedded_wsgi import call_wsgi_app, make_wsgi_view
 from twod.wsgi.handler import TwodWSGIRequest
 from twod.wsgi.exc import ApplicationCallError
@@ -47,7 +48,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
             if variable_name == 'wsgi.input':
                 actual_input = request.environ['wsgi.input']
                 eq_(0, actual_input.tell())
-                eq_('', actual_input.read())
+                eq_(b(''), actual_input.read())
             else:
                 eq_(expected_variable_value, request.environ[variable_name])
 
@@ -186,13 +187,8 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         request = _make_request(**environ)
         django_response = call_wsgi_app(app, request, "/posts")
         # Checking the response:
-        http_response = _concatenate_http_message_lines((
-            "X-HEADER: Foo",
-            "Content-Type: text/html; charset=utf-8",
-            "",
-            "body",
-            ))
-        eq_(http_response, str(django_response))
+        http_response_content = b("body")
+        eq_(http_response_content, django_response.content)
 
     def test_iterable_as_response(self):
         app = MockGeneratorApp("200 It is OK", [("X-HEADER", "Foo")])
@@ -202,14 +198,8 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         django_response = call_wsgi_app(app, request, "/posts")
         # Checking the response:
         ok_(django_response.has_header("X-HEADER"))
-        http_response_lines = (
-            "X-HEADER: Foo",
-            "Content-Type: text/html; charset=utf-8",
-            "",
-            "body as iterable",
-            )
-        http_response = _concatenate_http_message_lines(http_response_lines)
-        eq_(http_response, str(django_response))
+        http_response_content = b("body as iterable")
+        eq_(http_response_content, django_response.content)
 
     def test_write_response(self):
         app = MockWriteApp("200 It is OK", [("X-HEADER", "Foo")])
@@ -219,13 +209,8 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         django_response = call_wsgi_app(app, request, "/posts")
         # Checking the response:
         ok_(django_response.has_header("X-HEADER"))
-        http_response = _concatenate_http_message_lines((
-            "X-HEADER: Foo",
-            "Content-Type: text/html; charset=utf-8",
-            "",
-            "body as iterable",
-            ))
-        eq_(http_response, str(django_response))
+        http_response_content = b("body as iterable")
+        eq_(http_response_content, django_response.content)
 
     def test_closure_response(self):
         """The .close() method in the response (if any) must be kept."""
@@ -304,7 +289,3 @@ def _make_request(authenticated=False, **environ):
 
 
 #}
-
-
-def _concatenate_http_message_lines(message_lines):
-    return "\r\n".join(message_lines)

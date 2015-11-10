@@ -17,10 +17,10 @@
 Tests for the WSGI request handler.
 
 """
-from StringIO import StringIO
-from urllib import urlencode
-
 from nose.tools import eq_, ok_, assert_is_instance
+from six import BytesIO
+from six.moves.urllib.parse import urlencode
+from six import u
 from webob import Request
 
 from tests import BaseDjangoTestCase, complete_environ
@@ -57,13 +57,15 @@ class TestRequest(BaseDjangoTestCase):
 
 
 def _make_stub_post_request():
-    input_ = urlencode({'foo': "bar", 'bar': "foo"})
-    input_length = str(len(input_))
+    input_ = urlencode({'foo': "bar", 'bar': "foo"}).encode('UTF-8')
+
+    input_length = u('{}'.format(len(input_))).encode('UTF-8')
+
     environ = {
         'REQUEST_METHOD': "POST",
         'CONTENT_TYPE': "application/x-www-form-urlencoded",
         'CONTENT_LENGTH': input_length,
-        'wsgi.input': StringIO(input_),
+        'wsgi.input': BytesIO(input_),
         }
     environ = complete_environ(**environ)
     twod_request = TwodWSGIRequest(environ)
