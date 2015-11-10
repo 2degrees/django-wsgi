@@ -19,10 +19,11 @@ Utilities to use WSGI applications within Django.
 """
 
 from django.http import HttpResponse
+from six import PY2
+from six import text_type
 from six.moves.http_cookies import SimpleCookie
 
 from twod.wsgi.exc import ApplicationCallError
-
 
 __all__ = ("call_wsgi_app", "make_wsgi_view")
 
@@ -80,6 +81,9 @@ def call_wsgi_app(wsgi_app, request, path_info):
     django_response = HttpResponse(body, status=status_code)
     for (header, value) in headers:
         if header.upper() == "SET-COOKIE":
+            if PY2 and isinstance(value, text_type):
+                # It can't be Unicode:
+                value = value.encode("us-ascii")
             cookies.load(value)
         else:
             django_response[header] = value
