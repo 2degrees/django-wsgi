@@ -17,10 +17,10 @@
 Tests for the WSGI request handler.
 
 """
-from StringIO import StringIO
-from urllib import urlencode
-
 from nose.tools import eq_, ok_, assert_is_instance
+from six import BytesIO
+from six.moves.urllib.parse import urlencode
+from six import u
 from webob import Request
 
 from tests import BaseDjangoTestCase, complete_environ
@@ -68,8 +68,8 @@ class TestRequest(BaseDjangoTestCase):
         eq_(2, len(twod_request.webob.POST))
 
 
-def _make_stub_post_request(wsgi_input_class=StringIO):
-    input_ = urlencode({'foo': "bar", 'bar': "foo"})
+def _make_stub_post_request(wsgi_input_class=BytesIO):
+    input_ = urlencode({'foo': "bar", 'bar': "foo"}).encode()
     input_length = str(len(input_))
     environ = {
         'REQUEST_METHOD': "POST",
@@ -104,7 +104,7 @@ class _UnseekableFile(object):
 
     def __init__(self, text):
         super(_UnseekableFile, self).__init__()
-        self._text = StringIO(text)
+        self._text = BytesIO(text)
 
     def read(self, *args, **kwargs):
         return self._text.read(*args, **kwargs)

@@ -17,9 +17,9 @@
 Test suite for :mod:`twod.wsgi`.
 
 """
-from StringIO import StringIO
 import os
 
+from six import StringIO
 from django import conf
 from django.conf import LazySettings
 
