@@ -55,15 +55,27 @@ class TestRequest(BaseDjangoTestCase):
         eq_(2, len(twod_request.webob.POST))
         eq_(twod_request.webob.POST, twod_request.POST)
 
+    @staticmethod
+    def test_unseekable_body_read_by_django():
+        twod_request = _make_stub_post_request(_UnseekableFile)
 
-def _make_stub_post_request():
+        eq_(2, len(twod_request.POST))
+
+    @staticmethod
+    def test_unseekable_body_read_by_webob():
+        twod_request = _make_stub_post_request(_UnseekableFile)
+
+        eq_(2, len(twod_request.webob.POST))
+
+
+def _make_stub_post_request(wsgi_input_class=StringIO):
     input_ = urlencode({'foo': "bar", 'bar': "foo"})
     input_length = str(len(input_))
     environ = {
         'REQUEST_METHOD': "POST",
         'CONTENT_TYPE': "application/x-www-form-urlencoded",
         'CONTENT_LENGTH': input_length,
-        'wsgi.input': StringIO(input_),
+        'wsgi.input': wsgi_input_class(input_),
         }
     environ = complete_environ(**environ)
     twod_request = TwodWSGIRequest(environ)
@@ -86,6 +98,16 @@ class TestWSGIHandler(BaseDjangoTestCase):
         self.handler(environ, start_response)
 
         ok_(isinstance(self.handler.request, TwodWSGIRequest))
+
+
+class _UnseekableFile(object):
+
+    def __init__(self, text):
+        super(_UnseekableFile, self).__init__()
+        self._text = StringIO(text)
+
+    def read(self, *args, **kwargs):
+        return self._text.read(*args, **kwargs)
 
 
 class _TelltaleHandler(DjangoApplication):

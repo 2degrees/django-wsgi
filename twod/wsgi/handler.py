@@ -41,7 +41,8 @@ class TwodWSGIRequest(DjangoRequest):
 
     def __init__(self, environ):
         webob_request = WebobRequest(environ)
-        super(TwodWSGIRequest, self).__init__(environ)
+        webob_request.make_body_seekable()
+        super(TwodWSGIRequest, self).__init__(webob_request.environ)
         self.webob = webob_request
 
     # django.core.handlers.wsgi.WSGIRequest
