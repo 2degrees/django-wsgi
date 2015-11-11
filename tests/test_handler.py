@@ -20,7 +20,6 @@ Tests for the WSGI request handler.
 from nose.tools import eq_, ok_, assert_is_instance
 from six import BytesIO
 from six.moves.urllib.parse import urlencode
-from six import u
 from webob import Request
 
 from tests import BaseDjangoTestCase, complete_environ
