@@ -196,8 +196,6 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
         request = _make_request(**environ)
         django_response = call_wsgi_app(app, request, "/posts")
-        # Checking the response:
-        self._test_response_headers(django_response)
 
         http_response_content = b"body"
         eq_(http_response_content, django_response.content)
@@ -208,8 +206,6 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
         request = _make_request(**environ)
         django_response = call_wsgi_app(app, request, "/posts")
-        # Checking the response:
-        self._test_response_headers(django_response)
 
         http_response_content = b"body as iterable"
         eq_(http_response_content, django_response.content)
@@ -220,8 +216,6 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         environ = complete_environ(SCRIPT_NAME="/dev", PATH_INFO="/blog/posts")
         request = _make_request(**environ)
         django_response = call_wsgi_app(app, request, "/posts")
-        # Checking the response:
-        self._test_response_headers(django_response)
 
         http_response_content = b"body as iterable"
         eq_(http_response_content, django_response.content)
@@ -237,15 +231,6 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         assert_false(app.app_iter.closed)
         django_response.close()
         ok_(app.app_iter.closed)
-
-    def _test_response_headers(self, response):
-        expected_headers = {
-            'X-HEADER': 'Foo',
-            'Content-Type': 'text/html; charset=utf-8',
-        }
-        for header_name, header_value in expected_headers.items():
-            ok_(response.has_header(header_name))
-            eq_(response[header_name], header_value)
 
 
 class TestWSGIView(BaseDjangoTestCase):
