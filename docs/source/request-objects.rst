@@ -1,23 +1,22 @@
-======================================
-:mod:`webob.Request` objects in Django
-======================================
+===============================
+WebOb request objects in Django
+===============================
 
 *django-wsgi* extends Django's WSGI handler
 (:class:`django.core.handlers.wsgi.WSGIHandler`) and the
-:class:`~django.http.HttpRequest` class, so our handler uses our extended
-request class.
+:class:`~django.http.HttpRequest` class, so that our handler can use our
+extended request class.
 
 As mentioned before, what Django calls "handler" is actually a generic WSGI
 application that wraps your Django project. We'll stick to "WSGI application"
 from now on.
 
-This extended WSGI application offers a better WSGI support, as you would expect,
-because the request class it uses borrows functionality from
-:class:`webob.Request`. `WebOb <http://pythonpaste.org/webob/>`_ is another
-popular component of the Paste project, which offers pythonic APIs to WSGI
-requests (the so-called "WSGI environment") and responses, like
-:class:`~django.http.HttpRequest` and :class:`~django.http.HttpResponse`,
-but better:
+This extended WSGI application offers a better compatibility with WSGI
+middleware and applications thanks to the integration with
+:class:`webob.Request`. `WebOb <http://docs.webob.org/en/latest/>`_ is another
+offers pythonic APIs to WSGI requests (the so-called "WSGI environment") and
+responses -- much like :class:`~django.http.HttpRequest` and
+:class:`~django.http.HttpResponse`, but better:
 
 - Django copies some values from the environment into its own request object,
   on every request, no matter if you are going to use them or not.
@@ -29,30 +28,25 @@ but better:
   (may happen when read by WSGI middleware), while the intended behaviour
   is to **force** wrappers to read it.
 
-:class:`Our new request class <django_wsgi.handler.DjangoWSGIRequest>` extends both
-:class:`~django.http.HttpRequest` and :class:`webob.Request`, and because the
-members of the former take precedence over the latter, it's 100%
-compatible with the built-in request class in Django. :class:`webob.Response` is
-not used in *django-wsgi*.
+Instances of :class:`our request <django_wsgi.handler.DjangoWSGIRequest>` make
+an the equivalent WebOb request available as an attribute, so that you can use
+WebOb's accessors in your code. For example::
 
-:class:`~django.http.HttpRequest` takes precedence even with the following
-name clashes with :class:`webob.Request`:
+    def my_view(request):
+        if 'MSIE' in request.webob.user_agent:
+            response = HttpResponseNotFound()
+        else:
+            response = HttpResponse()
+        return response
 
-- ``environ``. 
-- ``path``.
-- ``method``.
-- ``POST``.
-- ``GET``.
+This request class will be used instead of the built-in one when you configure
+Django to use our "handler" in your ``settings.py``::
 
-:class:`webob.Request`'s ``.POST`` and ``.GET`` are available as ``.uPOST`` and
-``.uGET``, respectively. The other attributes are equivalent in both classes.
+    WSGI_APPLICATION = 'django_wsgi.handler.APPLICATION'
 
-When you use this application, your views receive the request as an instance of
-:class:`~django_wsgi.handler.DjangoWSGIRequest` automatically.
-
-See the `API documentation for webob.Request
-<http://pythonpaste.org/webob/class-webob.Request.html>`_ to meet the new
-members of your request objects.
+See the `documentation for webob.Request
+<http://docs.webob.org/en/latest/reference.html#request>`_ to learn more about
+the new features you now have at your disposal.
 
 
 Using the WSGI application directly
@@ -63,4 +57,4 @@ You can import it as you would normally do in Django::
     from os import environ
     environ['DJANGO_SETTINGS_MODULE'] = "yourpackage.settings"
     
-    from django_wsgi import DjangoApplication
+    from django_wsgi.handler import DjangoApplication

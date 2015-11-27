@@ -54,7 +54,7 @@ You just need to load an instance for that application and put it in your
 
     # urls.py
     
-    from django_wsgi import make_wsgi_view
+    from django_wsgi.embedded_wsgi import make_wsgi_view
     from cool_wsgi_app import CoolApplication
     
     urlpatterns = patterns('',
@@ -91,7 +91,7 @@ you need to set the path to the Trac environment on a per request basis
 (because you're hosting multiple Trac instances). You would create the
 following Django view::
 
-    from django_wsgi import call_wsgi_app
+    from django_wsgi.embedded_wsgi import call_wsgi_app
     from trac.web.main import dispatch_request as trac
     
     def run_trac(request, path_info):
@@ -102,7 +102,7 @@ If you then want to make it use your existing login and logout forms, you
 can update the view to make it look like this::
 
     from django.shortcuts import redirect
-    from django_wsgi import call_wsgi_app
+    from django_wsgi.embedded_wsgi import call_wsgi_app
     from trac.web.main import dispatch_request as trac
     
     def run_trac(request, path_info):
@@ -119,7 +119,7 @@ And if you're even more ambitious and want to serve Trac instances on-the-fly,
 you'd do this::
 
     from django.shortcuts import redirect
-    from django_wsgi import call_wsgi_app
+    from django_wsgi.embedded_wsgi import call_wsgi_app
     from trac.web.main import dispatch_request as trac
     
     def run_trac(request, trac_id, path_info):
@@ -151,7 +151,7 @@ application, which is available as a :class:`django.http.HttpResponse` instance.
 You can do anything you want with the response before returning it. If, for
 example, you wanted to set the ``Server`` header, you could do it like this::
 
-    from django_wsgi import call_wsgi_app
+    from django_wsgi.embedded_wsgi import call_wsgi_app
     from somewhere import wsgi_app
     
     def run_app(request, path_info):

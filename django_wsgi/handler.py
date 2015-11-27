@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 # Copyright (c) 2010-2015, 2degrees Limited.
@@ -27,15 +26,13 @@ __all__ = ("DjangoWSGIRequest", "DjangoApplication")
 
 class DjangoWSGIRequest(DjangoRequest):
     """
-    Pythonic proxy for the WSGI environment.
-    
-    This class is the Django request extended by WebOb's request. Where they
-    both have the same members, Django's take precedence. For example, ``.GET``
-    uses :attr:`django.core.handlers.wsgi.WSGIRequest.GET` instead of
-    :attr:`webob.Request.GET`.
-    
-    To access WebOb's GET and POST dictionaries, you have to use ``.uGET``
-    and ``.uPOST`` respectively.
+    Django request that makes an alternative WebOb request available as an
+    instance attribute.
+
+    .. attribute:: webob
+
+        :class:`webob.Request` instance for the WSGI environment behind the
+        current Django request.
     
     """
 
@@ -45,7 +42,6 @@ class DjangoWSGIRequest(DjangoRequest):
         super(DjangoWSGIRequest, self).__init__(webob_request.environ)
         self.webob = webob_request
 
-    # django.core.handlers.wsgi.WSGIRequest
     def read(self, *args, **kwargs):
         # Make environ['wsgi.input'] readable by Django, if WebOb read it
         self._stream.stream.seek(0)

@@ -16,12 +16,12 @@ Django-WSGI interoperability. This functionality is now available in the project
 
 Additionally, the following changes were made:
 
-* The following elements of the public API where moved and/or renamed:
-  - :mod:`twod.wsgi` to :mod:`django_wsgi`.
-  - :class:`twod.wsgi.handler:TwodWSGIRequest` to
-    :class:`django_wsgi.handler:DjangoWSGIRequest`.
-  - :class:`twod.wsgi.exc:TwodWSGIException` to
-    :class:`django_wsgi.exc:DjangoWSGIException`.
+* :class:`twod.wsgi.handler:TwodWSGIRequest` was renamed to
+  :class:`django_wsgi.handler:DjangoWSGIRequest`, and
+  :class:`twod.wsgi.exc:TwodWSGIException` was renamed to
+  :class:`django_wsgi.exc:DjangoWSGIException`.
+* :class:`django_wsgi.handler:DjangoWSGIRequest` is no longer subclassing both
+  Django's and WebOb's requests. Django's request class is the only parent now.
 * Introduced :data:`django_wsgi.handler.APPLICATION` to make it possible to
   set our handler directly via the ``WSGI_APPLICATION`` setting.
 * Removed the class ``TwodResponse``, which supported the setting of custom
