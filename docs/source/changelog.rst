@@ -22,6 +22,8 @@ Additionally, the following changes were made:
     :class:`django_wsgi.handler:DjangoWSGIRequest`.
   - :class:`twod.wsgi.exc:TwodWSGIException` to
     :class:`django_wsgi.exc:DjangoWSGIException`.
+* Introduced :data:`django_wsgi.handler.APPLICATION` to make it possible to
+  set our handler directly via the ``WSGI_APPLICATION`` setting.
 * Removed the class ``TwodResponse``, which supported the setting of custom
   HTTP status reasons, since newer versions of Django now support this.
 * Removed ability to import directly from the package :mod:`django_wsgi`.

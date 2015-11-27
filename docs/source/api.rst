@@ -10,6 +10,10 @@ API documentation for :mod:`django_wsgi`
 .. autoclass:: django_wsgi.handler.DjangoWSGIRequest
     :show-inheritance:
 
+
+.. autodata:: django_wsgi.handler.APPLICATION
+
+
 Embedded applications
 =====================
 

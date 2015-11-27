@@ -64,3 +64,7 @@ class DjangoApplication(DjangoWSGIHandler):
     """
 
     request_class = DjangoWSGIRequest
+
+
+APPLICATION = DjangoApplication()
+"""WSGI application based on :class:`DjangoApplication`."""
