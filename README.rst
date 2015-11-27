@@ -4,8 +4,8 @@ django-wsgi -- WSGI as first-class citizen in Django
 .. image:: https://travis-ci.org/2degrees/django-wsgi.svg?branch=master
     :target: https://travis-ci.org/2degrees/django-wsgi
 
-.. image:: https://coveralls.io/repos/2degrees/django-wsgi/badge.svg?branch=master
-    :target: https://coveralls.io/r/2degrees/django-wsgi?branch=master
+.. image:: https://coveralls.io/repos/2degrees/django-wsgi/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/2degrees/django-wsgi?branch=master
 
 django-wsgi unlocks Django applications so developers can take advantage of the
 wealth of existing WSGI software, as the other popular Python frameworks do. It
