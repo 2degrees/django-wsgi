@@ -132,12 +132,17 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         request = _make_request(**environ)
         headers = [
             ("Set-Cookie", "arg1=val1"),
-            ("Set-Cookie", "arg2=val2; expires=Fri,%2031-Dec-2010%2023:59:59%20GMT"),
+            ("Set-Cookie",
+                "arg2=val2; expires=Fri,%2031-Dec-2010%2023:59:59%20GMT"),
             ("Set-Cookie", "arg3=val3; path=/"),
             ("Set-Cookie", "arg4=val4; path=/wiki"),
             ("Set-Cookie", "arg5=val5; domain=.example.org"),
             ("Set-Cookie", "arg6=val6; max-age=3600"),
-            ("Set-Cookie", "arg7=val7; expires=Fri,%2031-Dec-2010%2023:59:59%20GMT; max-age=3600; domain=.example.org; path=/wiki"),
+            (
+                "Set-Cookie",
+                "arg7=val7; expires=Fri,%2031-Dec-2010%2023:59:59%20GMT; "
+                    "max-age=3600; domain=.example.org; path=/wiki",
+            ),
             # Now let's try an Unicode cookie:
             ("Set-Cookie", u"arg8=val8; max-age=3600"),
             # TODO: The "secure" cookie *attribute* is broken in SimpleCookie.
@@ -146,7 +151,10 @@ class TestCallWSGIApp(BaseDjangoTestCase):
             ]
         expected_cookies = {
             'arg1': {'value': "val1"},
-            'arg2': {'value': "val2", 'expires': "Fri,%2031-Dec-2010%2023:59:59%20GMT"},
+            'arg2': {
+                'value': "val2",
+                'expires': "Fri,%2031-Dec-2010%2023:59:59%20GMT",
+            },
             'arg3': {'value': "val3", 'path': "/"},
             'arg4': {'value': "val4", 'path': "/wiki"},
             'arg5': {'value': "val5", 'domain': ".example.org"},
@@ -175,9 +183,12 @@ class TestCallWSGIApp(BaseDjangoTestCase):
                              'Cookie "%s" has a wrong value ("%s")' %
                              (cookie_set_name, cookie_set.value))
             for (attr_key, attr_val) in expected_cookie.items():
-                eq_(cookie_set[attr_key], attr_val,
-                                 'Attribute "%s" in cookie %r is wrong (%r)' %
-                                 (attr_key, cookie_set_name, cookie_set[attr_key]))
+                eq_(
+                    cookie_set[attr_key],
+                    attr_val,
+                     'Attribute "%s" in cookie %r is wrong (%r)' %
+                         (attr_key, cookie_set_name, cookie_set[attr_key]),
+                )
 
     def test_string_as_response(self):
         app = MockApp("200 It is OK", [("X-HEADER", "Foo")])
