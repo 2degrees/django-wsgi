@@ -23,7 +23,7 @@ Finally, it's worth mentioning that:
 
 - This library has been used in production systems since 2009.
 - This project is comprehensively tested and fully documented.
-- It is known to work with Django 1.1.1-1.6 and Python 2.5-2.7.
+- It is known to work with Django v1.6+ and Python v2.7/v3.
   Please let us know if it doesn't.
 
 
