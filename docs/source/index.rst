@@ -9,9 +9,8 @@ Django projects don't get out-of-the-box, by improving the interoperability
 between Django and the rest of the WSGI ecosystem. To accomplish this,
 this library provides the following:
 
-- An enhanced :class:`~django.http.HttpRequest` class extended by the
-  fully-featured :class:`webob.Request` (which is absolutely backwards
-  compatible).
+- The ability to use the fully-featured ``Request`` class from WebOb along side
+  Django's :class:`~django.http.HttpRequest`.
 - Functions to run WSGI applications inside Django reliably.
 - A Django middleware which implements the `wsgiorg.routing_args
   <http://wsgi.org/wsgi/Specifications/routing_args>`_ standard.
