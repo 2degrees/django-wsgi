@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# twod.wsgi documentation build configuration file, created by
+# django-wsgi documentation build configuration file, created by
 # sphinx-quickstart on Thu Jan 21 14:07:59 2010.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'twod.wsgi'
+project = u'django-wsgi'
 copyright = u'2010-2013, 2degrees Limited'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -164,7 +164,7 @@ html_sidebars = {'index': sidebars, 'manual/index': sidebars, 'api': sidebars,
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'twodwsgidoc'
+htmlhelp_basename = 'djangowsgidoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -178,7 +178,7 @@ htmlhelp_basename = 'twodwsgidoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'twodwsgi.tex', u'twod.wsgi Documentation',
+  ('index', 'djangowsgi.tex', u'django-django_wsgi Documentation',
    u'2degrees Network', 'manual'),
 ]
 

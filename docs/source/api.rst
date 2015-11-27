@@ -1,28 +1,28 @@
-======================================
-API documentation for :mod:`twod.wsgi`
-======================================
+========================================
+API documentation for :mod:`django_wsgi`
+========================================
 
-.. automodule:: twod.wsgi
+.. automodule:: django_wsgi
     :synopsis: Enhanced WSGI support for Django
     :show-inheritance:
 
 
-.. autoclass:: twod.wsgi.handler.TwodWSGIRequest
+.. autoclass:: django_wsgi.handler.DjangoWSGIRequest
     :show-inheritance:
 
 Embedded applications
 =====================
 
-.. autofunction:: twod.wsgi.embedded_wsgi.make_wsgi_view
+.. autofunction:: django_wsgi.embedded_wsgi.make_wsgi_view
 
-.. autofunction:: twod.wsgi.embedded_wsgi.call_wsgi_app
+.. autofunction:: django_wsgi.embedded_wsgi.call_wsgi_app
 
 
 Exceptions
 ==========
 
-.. automodule:: twod.wsgi.exc
-    :synopsis: Exceptions ever raised by twod.wsgi
+.. automodule:: django_wsgi.exc
+    :synopsis: Exceptions ever raised by django-wsgi
     :members:
     :show-inheritance:
 

@@ -4,7 +4,7 @@
 # Copyright (c) 2010, 2013, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
+# This file is part of django-wsgi <https://github.com/2degrees/django-wsgi/>,
 # which is subject to the provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -14,7 +14,7 @@
 #
 ##############################################################################
 """
-Test suite for :mod:`twod.wsgi`.
+Test suite for :mod:`django_wsgi`.
 
 """
 import os

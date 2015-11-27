@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright (c) 2010, 2013, 2degrees Limited.
+# Copyright (c) 2010-2015, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
+# This file is part of django-wsgi <https://github.com/2degrees/django-wsgi/>,
 # which is subject to the provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -14,19 +14,21 @@
 #
 ##############################################################################
 """
-WSGI and Django middleware.
+Exceptions raised by :mod:`django_wsgi.`
 
 """
 
-__all__ = ("RoutingArgsMiddleware", )
+__all__ = ("DjangoWSGIException", "ApplicationCallError")
 
 
-class RoutingArgsMiddleware(object):
+class DjangoWSGIException(Exception):
+    """Base class for exceptions raised by :mod:`django_wsgi`."""
+    pass
+
+
+class ApplicationCallError(DjangoWSGIException):
     """
-    Django middleware which implements the `wsgiorg.routing_args standard
-    <http://wsgi.org/wsgi/Specifications/routing_args>`_.
+    Exception raised when an embedded WSGI application was not called properly.
     
     """
-    
-    def process_view(self, request, view_func, view_args, view_kwargs):
-        request.environ['wsgiorg.routing_args'] = (view_args, view_kwargs.copy())
+    pass

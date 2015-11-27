@@ -7,7 +7,7 @@ extension to the WSGI standard which normalises the place to put the
 arguments found in the URL. This is particularly useful for 3rd party WSGI
 libraries and the dispatching components in Web frameworks
 are expected to set it, but Django does not: Therefore we created the
-:class:`~twod.wsgi.RoutingArgsMiddleware` Django middleware.
+:class:`~django_wsgi.RoutingArgsMiddleware` Django middleware.
 
 If you requested the path ``/blog/posts/hello-world/comments/3``, then the
 arguments ``hello-world`` and ``3`` will be available in the request object.
@@ -16,7 +16,7 @@ used named groups) or a tuple (if you didn't set names for the matching groups).
 The former are referred to as "named arguments" and the latter as "positional
 arguments" in *routing_args* specification.
 
-:class:`~twod.wsgi.RoutingArgsMiddleware` simply puts the arguments found by the
+:class:`~django_wsgi.RoutingArgsMiddleware` simply puts the arguments found by the
 Django URL resolver in the ``request`` object. It's such a simple thing, but
 it's key for Django-independent libraries, which may not be run in the
 context of a Django middleware nor a Django view.

@@ -1,8 +1,8 @@
-===================
-About **twod.wsgi**
-===================
+=====================
+About **django-wsgi**
+=====================
 
-*twod.wsgi* has only one goal, which is to bring WSGI support to Django
+*django-wsgi* has only one goal, which is to bring WSGI support to Django
 to the same level as in the other modern Python frameworks. We tried it to
 implement these improvements at the core of Django, but unfortunately `that
 is not going to happen
@@ -16,7 +16,7 @@ This is another project brought to you by `2degrees Limited
 Getting help
 ============
 
-Keep in mind that **twod.wsgi is a thin integration layer**, so if you have
+Keep in mind that **django-wsgi is a thin integration layer**, so if you have
 questions about the 3rd party software mentioned in this documentation, it's
 best to use the support channels for the corresponding project.
 
@@ -25,20 +25,9 @@ use the `paste-users mailing list <http://groups.google.com/group/paste-users>`_
 `Python's Web-SIG <http://mail.python.org/mailman/listinfo/web-sig>`_ is the
 right place for queries about WSGI in general.
 
-For questions directly related to *twod.wsgi* or if you're not sure what's
+For questions directly related to *django-wsgi* or if you're not sure what's
 the right place to ask a given question, please use our `2degrees-floss mailing
 list <http://groups.google.com/group/2degrees-floss/>`_.
-
-
-Supporting twod.wsgi
-====================
-
-If you've found this project useful, please help us spread the word about it
-in the Django community!
-
-You may also consider voting for it on
-`Ohloh <https://www.ohloh.net/p/twod-wsgi>`_ and/or `Freshmeat
-<http://freshmeat.net/projects/twodwsgi>`_.
 
 
 Development
@@ -54,7 +43,7 @@ long as:
 - The new code doesn't break existing functionality.
 
 Please go to `our development site on GitHub
-<https://github.com/2degrees/twod.wsgi/>`_ to get the 
-`latest code <https://github.com/2degrees/twod.wsgi/download/>`_,
+<https://github.com/2degrees/django-wsgi/>`_ to get the
+`latest code <https://github.com/2degrees/django-wsgi/download/>`_,
 fork it (and ask us to merge them into ours) and raise
-`issues <https://github.com/2degrees/twod.wsgi/issues/>`_.
+`issues <https://github.com/2degrees/django-wsgi/issues/>`_.

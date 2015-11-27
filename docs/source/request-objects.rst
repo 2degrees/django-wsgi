@@ -2,7 +2,7 @@
 :mod:`webob.Request` objects in Django
 ======================================
 
-*twod.wsgi* extends Django's WSGI handler
+*django-wsgi* extends Django's WSGI handler
 (:class:`django.core.handlers.wsgi.WSGIHandler`) and the
 :class:`~django.http.HttpRequest` class, so our handler uses our extended
 request class.
@@ -29,11 +29,11 @@ but better:
   (may happen when read by WSGI middleware), while the intended behaviour
   is to **force** wrappers to read it.
 
-:class:`Our new request class <twod.wsgi.handler.TwodWSGIRequest>` extends both
+:class:`Our new request class <django_wsgi.handler.DjangoWSGIRequest>` extends both
 :class:`~django.http.HttpRequest` and :class:`webob.Request`, and because the
 members of the former take precedence over the latter, it's 100%
 compatible with the built-in request class in Django. :class:`webob.Response` is
-not used in *twod.wsgi*.
+not used in *django-wsgi*.
 
 :class:`~django.http.HttpRequest` takes precedence even with the following
 name clashes with :class:`webob.Request`:
@@ -48,7 +48,7 @@ name clashes with :class:`webob.Request`:
 ``.uGET``, respectively. The other attributes are equivalent in both classes.
 
 When you use this application, your views receive the request as an instance of
-:class:`~twod.wsgi.handler.TwodWSGIRequest` automatically.
+:class:`~django_wsgi.handler.DjangoWSGIRequest` automatically.
 
 See the `API documentation for webob.Request
 <http://pythonpaste.org/webob/class-webob.Request.html>`_ to meet the new
@@ -63,4 +63,4 @@ You can import it as you would normally do in Django::
     from os import environ
     environ['DJANGO_SETTINGS_MODULE'] = "yourpackage.settings"
     
-    from twod.wsgi import DjangoApplication
+    from django_wsgi import DjangoApplication

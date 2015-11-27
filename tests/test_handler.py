@@ -4,7 +4,7 @@
 # Copyright (c) 2010-2015, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
+# This file is part of django-wsgi <https://github.com/2degrees/django-wsgi/>,
 # which is subject to the provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -23,7 +23,7 @@ from six.moves.urllib.parse import urlencode
 from webob import Request
 
 from tests import BaseDjangoTestCase, complete_environ
-from twod.wsgi.handler import DjangoApplication, TwodWSGIRequest
+from django_wsgi.handler import DjangoApplication, DjangoWSGIRequest
 
 
 class TestRequest(BaseDjangoTestCase):
@@ -32,39 +32,38 @@ class TestRequest(BaseDjangoTestCase):
     def test_webob_request():
         """The WebOb request is available as a public attribute."""
         environ = complete_environ()
-        twod_request = TwodWSGIRequest(environ)
+        request = DjangoWSGIRequest(environ)
 
-        ok_(hasattr(twod_request, 'webob'))
-        assert_is_instance(twod_request.webob, Request)
-        eq_(twod_request.environ, twod_request.webob.environ)
+        ok_(hasattr(request, 'webob'))
+        assert_is_instance(request.webob, Request)
+        eq_(request.environ, request.webob.environ)
 
     @staticmethod
     def test_request_body_read_by_django_first():
         """WebOb is able to read the request after Django."""
-        twod_request = _make_stub_post_request()
+        request = _make_stub_post_request()
 
-        eq_(2, len(twod_request.POST))
-        eq_(twod_request.POST, twod_request.webob.POST)
+        eq_(2, len(request.POST))
+        eq_(request.POST, request.webob.POST)
 
     @staticmethod
     def test_request_body_read_by_webob_first():
         """Django is able to read the request after WebOb."""
-        twod_request = _make_stub_post_request()
+        request = _make_stub_post_request()
 
-        eq_(2, len(twod_request.webob.POST))
-        eq_(twod_request.webob.POST, twod_request.POST)
+        eq_(2, len(request.webob.POST))
+        eq_(request.webob.POST, request.POST)
 
     @staticmethod
     def test_unseekable_body_read_by_django():
-        twod_request = _make_stub_post_request(_UnseekableFile)
-
-        eq_(2, len(twod_request.POST))
+        request = _make_stub_post_request(_UnseekableFile)
+        eq_(2, len(request.POST))
 
     @staticmethod
     def test_unseekable_body_read_by_webob():
-        twod_request = _make_stub_post_request(_UnseekableFile)
+        request = _make_stub_post_request(_UnseekableFile)
 
-        eq_(2, len(twod_request.webob.POST))
+        eq_(2, len(request.webob.POST))
 
 
 def _make_stub_post_request(wsgi_input_class=BytesIO):
@@ -77,8 +76,8 @@ def _make_stub_post_request(wsgi_input_class=BytesIO):
         'wsgi.input': wsgi_input_class(input_),
         }
     environ = complete_environ(**environ)
-    twod_request = TwodWSGIRequest(environ)
-    return twod_request
+    request = DjangoWSGIRequest(environ)
+    return request
 
 
 class TestWSGIHandler(BaseDjangoTestCase):
@@ -89,14 +88,15 @@ class TestWSGIHandler(BaseDjangoTestCase):
         self.handler = _TelltaleHandler()
 
     def test_right_request_class(self):
-        """The WSGI handler must use Twod's request class."""
+        """The WSGI handler must use the custom request class."""
         environ = complete_environ(REQUEST_METHOD="GET", PATH_INFO="/")
 
-        def start_response(status, response_headers): pass
+        def start_response(status, response_headers):
+            pass
 
         self.handler(environ, start_response)
 
-        ok_(isinstance(self.handler.request, TwodWSGIRequest))
+        ok_(isinstance(self.handler.request, DjangoWSGIRequest))
 
 
 class _UnseekableFile(object):
@@ -110,11 +110,6 @@ class _UnseekableFile(object):
 
 
 class _TelltaleHandler(DjangoApplication):
-    """
-    Mock WSGI handler based on Twod's, which is going to be called once and it's
-    going to store the request object it got.
-    
-    """
 
     def get_response(self, request):
         self.request = request

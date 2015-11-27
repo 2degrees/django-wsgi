@@ -3,7 +3,7 @@ Embedding WSGI applications
 ===========================
 
 The other WSGI frameworks support running external applications from within
-the current WSGI application and Django does now thanks to *twod.wsgi*. This
+the current WSGI application and Django does now thanks to *django-wsgi*. This
 gives you the ability to serve 3rd party applications on-the-fly, as well as
 control the requests they get and the responses they return (in order to
 filter them or replace them completely).
@@ -54,7 +54,7 @@ You just need to load an instance for that application and put it in your
 
     # urls.py
     
-    from twod.wsgi import make_wsgi_view
+    from django_wsgi import make_wsgi_view
     from cool_wsgi_app import CoolApplication
     
     urlpatterns = patterns('',
@@ -84,14 +84,14 @@ Calling them from a Django view
 
 If you need more control over what the inner application receives and/or what it
 returns, you'd need to call it yourself from your view by using
-:func:`twod.wsgi.call_wsgi_app`.
+:func:`django_wsgi.call_wsgi_app`.
 
 Say you want to serve an instance of `Trac <http://trac.edgewall.org/>`_ and
 you need to set the path to the Trac environment on a per request basis
 (because you're hosting multiple Trac instances). You would create the
 following Django view::
 
-    from twod.wsgi import call_wsgi_app
+    from django_wsgi import call_wsgi_app
     from trac.web.main import dispatch_request as trac
     
     def run_trac(request, path_info):
@@ -102,7 +102,7 @@ If you then want to make it use your existing login and logout forms, you
 can update the view to make it look like this::
 
     from django.shortcuts import redirect
-    from twod.wsgi import call_wsgi_app
+    from django_wsgi import call_wsgi_app
     from trac.web.main import dispatch_request as trac
     
     def run_trac(request, path_info):
@@ -119,7 +119,7 @@ And if you're even more ambitious and want to serve Trac instances on-the-fly,
 you'd do this::
 
     from django.shortcuts import redirect
-    from twod.wsgi import call_wsgi_app
+    from django_wsgi import call_wsgi_app
     from trac.web.main import dispatch_request as trac
     
     def run_trac(request, trac_id, path_info):
@@ -151,12 +151,12 @@ application, which is available as a :class:`django.http.HttpResponse` instance.
 You can do anything you want with the response before returning it. If, for
 example, you wanted to set the ``Server`` header, you could do it like this::
 
-    from twod.wsgi import call_wsgi_app
+    from django_wsgi import call_wsgi_app
     from somewhere import wsgi_app
     
     def run_app(request, path_info):
         response = call_wsgi_app(wsgi_app, request, path_info)
-        response['Server'] = "twod.wsgi 1.0"
+        response['Server'] = "django-wsgi 1.0"
         return response
 
 .. warning:: **Avoid reading the body of a response!**

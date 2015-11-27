@@ -4,7 +4,7 @@
 # Copyright (c) 2009-2015, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
+# This file is part of django-wsgi <https://github.com/2degrees/django-wsgi/>,
 # which is subject to the provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -23,7 +23,7 @@ from six import PY2
 from six import text_type
 from six.moves.http_cookies import SimpleCookie
 
-from twod.wsgi.exc import ApplicationCallError
+from django_wsgi.exc import ApplicationCallError
 
 __all__ = ("call_wsgi_app", "make_wsgi_view")
 
@@ -35,10 +35,10 @@ def call_wsgi_app(wsgi_app, request, path_info):
     :param wsgi_app: The WSGI application to be run.
     :type wsgi_app: callable
     :param request: The Django request.
-    :type request: :class:`twod.wsgi.handler.TwodWSGIRequest`
+    :type request: :class:`django_wsgi.handler.DjangoWSGIRequest`
     :param path_info: The ``PATH_INFO`` to be used by the WSGI application.
     :type path: :class:`basestring`
-    :raises twod.wsgi.exc.ApplicationCallError: If ``path_info`` is not the
+    :raises django_wsgi.exc.ApplicationCallError: If ``path_info`` is not the
         last portion of the ``PATH_INFO`` in ``request``.
     :return: The response from the WSGI application, turned into a Django
         response.

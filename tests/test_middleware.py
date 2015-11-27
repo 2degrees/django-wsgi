@@ -4,7 +4,7 @@
 # Copyright (c) 2010, 2013, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
+# This file is part of django-wsgi <https://github.com/2degrees/django-wsgi/>,
 # which is subject to the provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -21,7 +21,7 @@ import os
 
 from nose.tools import eq_, ok_
 
-from twod.wsgi.middleware import RoutingArgsMiddleware
+from django_wsgi.middleware import RoutingArgsMiddleware
 
 os.environ['DJANGO_SETTINGS_MODULE'] = "tests.fixtures.sampledjango"
 

@@ -4,7 +4,7 @@
 # Copyright (c) 2009-2015, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of twod.wsgi <https://github.com/2degrees/twod.wsgi/>,
+# This file is part of django-wsgi <https://github.com/2degrees/django-wsgi/>,
 # which is subject to the provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -19,9 +19,9 @@ Tests for the use of WSGI applications within Django.
 """
 from nose.tools import eq_, ok_, assert_false, assert_raises
 
-from twod.wsgi.embedded_wsgi import call_wsgi_app, make_wsgi_view
-from twod.wsgi.handler import TwodWSGIRequest
-from twod.wsgi.exc import ApplicationCallError
+from django_wsgi.embedded_wsgi import call_wsgi_app, make_wsgi_view
+from django_wsgi.handler import DjangoWSGIRequest
+from django_wsgi.exc import ApplicationCallError
 
 from tests import (BaseDjangoTestCase, MockApp, MockClosingApp, MockWriteApp,
                    MockGeneratorApp, complete_environ)
@@ -291,7 +291,7 @@ def _make_request(authenticated=False, **environ):
             self.authenticated = authenticated
         def is_authenticated(self):
             return self.authenticated
-    request = TwodWSGIRequest(environ)
+    request = DjangoWSGIRequest(environ)
     request.user = MockDjangoUser(authenticated)
     return request
 

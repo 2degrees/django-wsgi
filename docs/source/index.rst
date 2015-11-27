@@ -1,10 +1,10 @@
-:mod:`twod.wsgi`: WSGI as first-class citizen in Django applications
-====================================================================
+:mod:`django_wsgi`: WSGI as first-class citizen in Django applications
+======================================================================
 
 :Sponsored by: `2degrees Limited <http://dev.2degreesnetwork.com/>`_.
 :Latest release: |release|
 
-**twod.wsgi** allows you to use the advanced/common functionality in WSGI that
+**django-wsgi** allows you to use the advanced/common functionality in WSGI that
 Django projects don't get out-of-the-box, by improving the interoperability
 between Django and the rest of the WSGI ecosystem. To accomplish this,
 this library provides the following:

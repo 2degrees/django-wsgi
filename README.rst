@@ -1,13 +1,13 @@
-twod.wsgi -- WSGI as first-class citizen in Django
-==================================================
+django-wsgi -- WSGI as first-class citizen in Django
+====================================================
 
-.. image:: https://travis-ci.org/2degrees/twod.wsgi.svg?branch=master
-    :target: https://travis-ci.org/2degrees/twod.wsgi
+.. image:: https://travis-ci.org/2degrees/django-wsgi.svg?branch=master
+    :target: https://travis-ci.org/2degrees/django-wsgi
 
-.. image:: https://coveralls.io/repos/2degrees/twod.wsgi/badge.svg?branch=master
-    :target: https://coveralls.io/r/2degrees/twod.wsgi?branch=master
+.. image:: https://coveralls.io/repos/2degrees/django-wsgi/badge.svg?branch=master
+    :target: https://coveralls.io/r/2degrees/django-wsgi?branch=master
 
-twod.wsgi unlocks Django applications so developers can take advantage of the
+django-wsgi unlocks Django applications so developers can take advantage of the
 wealth of existing WSGI software, as the other popular Python frameworks do. It
 won't break you existing Django applications because it's 100% compatible with
 Django and you can start using the functionality offered by this library

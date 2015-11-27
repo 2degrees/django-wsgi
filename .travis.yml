@@ -7,6 +7,6 @@ python:
 install: pip install .
 before_script:
   - pip install -r tests/requirements.txt
-script:  coverage run --source=twod.wsgi setup.py test
+script:  coverage run --source=django_wsgi setup.py test
 after_success:
   - coveralls
