@@ -52,9 +52,6 @@ setup(name="twod.wsgi",
       packages=find_packages(exclude=["tests"]),
       py_modules=["django_testing", "django_testing_recipe"],
       zip_safe=False,
-      tests_require = [
-        "coverage",
-        ],
       install_requires=[
         "Django >= 1.1",
         "WebOb >= 0.9.7, < 1.0dev",
