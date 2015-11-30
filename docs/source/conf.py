@@ -96,8 +96,6 @@ pygments_style = 'sphinx'
 # Sphinx are currently 'default' and 'sphinxdoc'.
 html_theme = 'alabaster'
 
-show_related = True
-
 html_sidebars = {
     '**': ['about.html', 'navigation.html']
 }
