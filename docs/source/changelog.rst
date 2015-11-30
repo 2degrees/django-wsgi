@@ -21,7 +21,9 @@ Additionally, the following changes were made:
   :class:`twod.wsgi.exc:TwodWSGIException` was renamed to
   :class:`django_wsgi.exc:DjangoWSGIException`.
 * :class:`django_wsgi.handler:DjangoWSGIRequest` is no longer subclassing both
-  Django's and WebOb's requests. Django's request class is the only parent now.
+  Django's and WebOb's requests. Django's request class is the only parent now,
+  and the WebOb request instance is available as the instance attribute
+  ``webob`` (i.e., ``request.webob``).
 * Introduced :data:`django_wsgi.handler.APPLICATION` to make it possible to
   set our handler directly via the ``WSGI_APPLICATION`` setting.
 * Removed the class ``TwodResponse``, which supported the setting of custom
