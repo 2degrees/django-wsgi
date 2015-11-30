@@ -1,7 +1,6 @@
 include LICENSE.txt
 include README.txt
 include VERSION.txt
-include MANIFEST.in
 
 exclude setup.cfg
 exclude MANIFEST.in
