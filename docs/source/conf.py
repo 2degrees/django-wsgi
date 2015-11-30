@@ -99,15 +99,17 @@ html_theme = 'alabaster'
 show_related = True
 
 html_sidebars = {
-    '**': [
-        'navigation.html',
-    ]
+    '**': ['about.html', 'navigation.html']
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+    'description': 'WSGI as first-class citizen in Django applications',
+    'github_user': '2degrees',
+    'github_repo': 'django-wsgi',
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
