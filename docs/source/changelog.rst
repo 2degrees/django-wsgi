@@ -2,7 +2,7 @@
 Releases
 ========
 
-Version 1 Beta 1 (unreleased)
+Version 1 Beta 1 (2015-11-30)
 =============================
 
 This is a backwards-incompatible fork of `twod.wsgi v1.0.1
