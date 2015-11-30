@@ -2,6 +2,9 @@
 twod.wsgi -- WSGI as first-class citizen in Django
 **************************************************
 
+*This library is now deprecated in favour of django-wsgi:*
+https://pythonhosted.org/django-wsgi/
+
 twod.wsgi unlocks Django applications so developers can take advantage of the
 wealth of existing WSGI software, as the other popular Python frameworks do. It
 won't break you existing Django applications because it's 100% compatible with

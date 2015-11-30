@@ -4,6 +4,9 @@
 :Sponsored by: `2degrees Limited <http://dev.2degreesnetwork.com/>`_.
 :Latest release: |release|
 
+.. warning::
+   This library is now deprecated in favour of `django-wsgi
+   <https://pythonhosted.org/django-wsgi/>`_.
 
 **twod.wsgi** unlocks Django applications so that developers can take advantage
 of the `wealth of existing WSGI software
