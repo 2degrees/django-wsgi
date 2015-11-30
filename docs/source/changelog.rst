@@ -2,8 +2,8 @@
 Releases
 ========
 
-Unreleased
-==========
+Version 1.0.2
+=============
 
 * Seek operations have been restricted to the ``wsgi.input`` of POST and PUT
   requests. This fixes a bug with Django Admin in Django 1.2 where a view
