@@ -198,7 +198,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         django_response = call_wsgi_app(app, request, "/posts")
 
         http_response_content = b"body"
-        eq_(http_response_content, django_response.content)
+        eq_(http_response_content, _resolve_response_body(django_response))
 
     def test_iterable_as_response(self):
         app = MockGeneratorApp("200 It is OK", [("X-HEADER", "Foo")])
@@ -208,7 +208,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         django_response = call_wsgi_app(app, request, "/posts")
 
         http_response_content = b"body as iterable"
-        eq_(http_response_content, django_response.content)
+        eq_(http_response_content, _resolve_response_body(django_response))
 
     def test_write_response(self):
         app = MockWriteApp("200 It is OK", [("X-HEADER", "Foo")])
@@ -218,7 +218,7 @@ class TestCallWSGIApp(BaseDjangoTestCase):
         django_response = call_wsgi_app(app, request, "/posts")
 
         http_response_content = b"body as iterable"
-        eq_(http_response_content, django_response.content)
+        eq_(http_response_content, _resolve_response_body(django_response))
 
     def test_closure_response(self):
         """The .close() method in the response (if any) must be kept."""
@@ -294,6 +294,12 @@ def _make_request(authenticated=False, **environ):
     request = DjangoWSGIRequest(environ)
     request.user = MockDjangoUser(authenticated)
     return request
+
+
+def _resolve_response_body(response):
+    body_parts = tuple(response)
+    body_text = b"".join(body_parts)
+    return body_text
 
 
 #}
