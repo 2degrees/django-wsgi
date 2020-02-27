@@ -1,6 +1,8 @@
 django-wsgi -- WSGI as first-class citizen in Django
 ====================================================
 
+**This project is no longer maintained.**
+
 .. image:: https://travis-ci.org/2degrees/django-wsgi.svg?branch=master
     :target: https://travis-ci.org/2degrees/django-wsgi
 
